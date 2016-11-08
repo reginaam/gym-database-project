@@ -1,7 +1,7 @@
 <?php
 
 $success = True; //keep track of errors so it redirects the page only if there are no errors
-include 'userinfo';
+include 'userinfo.php';
 $db_conn = OCILogon($username, $password, "ug");
 
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
