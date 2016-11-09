@@ -14,14 +14,16 @@ $username = $row[0];
 $email = $row[1];
 $phone = $row[2];
 
-// Personal errors
+// Errors
 $personalerror = "";
+$usererror = "";
 $nameerror = "";
 $emailerror = "";
 $phoneerror = "";
 
-// Personal form handling
+// Form handling
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+	// Personal section
 	if (array_key_exists('personal', $_POST)) {
 		$newname = $_POST['name'];
 		if (strlen($newname)> 40) {
@@ -48,10 +50,66 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			$personalerror = "Error updating info";
 		}
 	}
+	else if (array_key_exists('newuser', $_POST)) {
+		$anyerrors = false;
+		$u_name = $_POST['name'];
+		if (strlen($u_name)> 40) {
+			$nameerror = "Name too long";
+			$anyerrors = true;
+		}
+		$u_email = $_POST['email'];
+		if (!filter_var($u_email, FILTER_VALIDATE_EMAIL)) {
+			$emailerror = "Enter a valid email";
+			$anyerrors = true;
+		}
+		$u_phone = $_POST['phone'];
+		if (!preg_match("/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/", $u_phone)) {
+			$phoneerror = "Phone number must be in the format xxx-xxx-xxxx";
+			$anyerrors = true;
+		}
+		$sql = "select membership_id from gymuser order by membership_id desc";
+		$state = OCI_Parse($db_conn, $sql);
+		$r = oci_execute($state);
+		if (!$r) {
+			$anyerrors = true;
+		}
+		if (!$anyerrors) {
+			$row = oci_fetch_array($state);
+			$newid = $row[0] + 1;
+			
+			$sql = "insert into gymuser values(".$newid.", '".$u_email."', '".$u_name."', '".$u_phone."')";
+			$state = OCI_Parse($db_conn, $sql);
+			$r = oci_execute($state);
+			if (!$r) {
+				$usererror = "Failed to create new user";
+			} else {
+				$usertype = $_POST['utype'];
+				if ($usertype == "athlete") {
+					$sql = "insert into athlete values($newid)";
+					$state = OCI_Parse($db_conn, $sql);
+					$r = oci_execute($state);
+					if (!$r) {
+						$usererror = "Failed to create new user";
+					}
+				} else if ($usertype == "trainer") {
+					$sql = "insert into trainer values($newid)";
+					$state = OCI_Parse($db_conn, $sql);
+					$r = oci_execute($state);
+					if (!$r) {
+						$usererror = "Failed to create new user";
+					}
+				} else if ($usertype == "admin") {
+					$sql = "insert into gymadmin values($newid)";
+					$state = OCI_Parse($db_conn, $sql);
+					$r = oci_execute($state);
+					if (!$r) {
+						$usererror = "Failed to create new user";
+					}
+				}
+			}
+		}
+	}
 }
-
-// ------------------------------------
-// Gym/classes section
 
 
 
@@ -100,6 +158,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			}
 		?>
 	</div>
-	<div class="view" id="users"></div>
+	<div class="view" id="users">
+		<h3> Users </h3>
+		<p> Create a new user </p>
+		<form method=post>
+			<span style="color:red;"><?php echo $usererror ?></span><br>
+			<label>Name: </label><span style="color:red;"><?php echo $nameerror ?></span><input name="name" type=text><br>
+			<label>Email:</label><span style="color:red;"><?php echo $emailerror ?></span><input name="email" type=text><br>
+			<label>Phone number:</label><span style="color:red;"><?php echo $phoneerror ?></span><input name="phone" type=text><br>
+			<label>User type: </label><br><input type="radio" name="utype" value="athlete" checked>Athlete<br><input type="radio" name="utype" value="trainer">Trainer<br><input type="radio" name="utype" value="admin">Admin<br>
+			<input type=submit name="newuser">
+		</form>
+	</div>
 </body>
 </html>
