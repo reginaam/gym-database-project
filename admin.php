@@ -149,7 +149,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 					oci_execute($parseclass);
 					
 					while (($classrow = oci_fetch_array($parseclass, OCI_BOTH)) != false) {
-						echo "<li>" . $classrow[1] . " with " . $classrow[3] . ", $" . $classrow[2] . "<form method=get action='editclass.php'><input type=hidden name='classid' value=" . $classrow[0] . "><button type='submit'>Edit class</button></form><br></li>";
+						echo "<li>" . $classrow[1] . " with " . $classrow[3] . ", $" . $classrow[2] . "<form method=get action='editclass.php'><input type=hidden name='classid' value=" . $classrow[0] . "><input type=hidden name='mid' value=$mid><button type='submit'>Edit class</button></form><br></li>";
 					}
 					
 					echo "</ul></li>";
