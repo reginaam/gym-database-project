@@ -143,7 +143,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			else {
 				echo "<h3> Gyms </h3><form method=get action='newgym.php'><input type=hidden name='mid' value=$mid><button type='submit'>New Gym</button></form><ul>";
 				while (($row = oci_fetch_array($parse, OCI_BOTH)) != false) {
-					echo "<li>" . $row[0] . ", " . $row[1] . " <form method=get action='editgym.php'><input type=hidden name='gymname' value='" . $row[0] . "'><input type=hidden name='gymloc' value='" . $row[1] . "'><button type='submit'>Edit Gym info</button></form><br><p>Classes</p><form method=get action='newclass.php'><input type=hidden name='mid' value=$mid><input type=hidden name='gymname' value='". $row[0] ."'><input type=hidden name='gymloc' value='".$row[1]."'><button type='submit'>New Class</button></form><ul>";
+					echo "<li>" . $row[0] . ", " . $row[1] . " <form method=get action='editgym.php'><input type=hidden name='gymname' value='" . $row[0] . "'><input type=hidden name='gymloc' value='" . $row[1] . "'><input type=hidden name='mid' value=$mid><button type='submit'>Edit Gym</button></form><br><p>Classes</p><form method=get action='newclass.php'><input type=hidden name='mid' value=$mid><input type=hidden name='gymname' value='". $row[0] ."'><input type=hidden name='gymloc' value='".$row[1]."'><button type='submit'>New Class</button></form><ul>";
 					$sql = "select distinct gc.class_id, gc.name, gc.cost, t.name from gymclass gc, gymuser t where gc.gym_name = '".$row[0]."' and gc.gym_location = '". $row[1]."' and gc.trainer_membership_id = t.membership_id order by gc.name";
 					$parseclass = OCI_Parse($db_conn, $sql);
 					oci_execute($parseclass);
