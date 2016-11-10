@@ -1,0 +1,42 @@
+body {
+	font-family: 'Helvetica';
+	font-size: 18px;
+	padding: 0px;
+	margin: 0px;
+}
+
+#nav {
+	width: 100%;
+	margin: 0px;
+	margin-bottom: 25px;
+}
+
+.tab {
+	width: 33%;
+	border-bottom: 2px solid #4489ff;
+	font-size: 25px;
+	color: #4489ff;
+	background-color: white;
+	display: inline-flex;
+}
+
+.tab p {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.tab:hover {
+	background-color:#aac9ff;
+	color: white;
+}
+
+.tab.selected {
+	background-color: #4489ff;
+	color: white;
+}
+
+.innerview {
+	width: 50%;
+	margin: 0 auto;
+	text-align: center;
+}

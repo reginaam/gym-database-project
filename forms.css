@@ -1,0 +1,24 @@
+label {
+	color: #4489ff;
+}
+
+br {
+	margin-top: 10px;
+}
+
+input[type=text] {
+	border: none;
+	border-bottom: 1px solid #4489ff;
+	text-align: center;
+	color:#100099;
+}
+
+form span {
+	color: red;
+	font-style: italic;
+	font-size: 12px;
+}
+
+input[type=radio] {
+	color: #4489ff;
+}

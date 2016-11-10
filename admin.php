@@ -21,33 +21,41 @@ $nameerror = "";
 $emailerror = "";
 $phoneerror = "";
 
+$u_name = $u_email = $u_phone = "";
+
 // Form handling
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	// Personal section
 	if (array_key_exists('personal', $_POST)) {
+		$anyerrors = false;
 		$newname = $_POST['name'];
 		if (strlen($newname)> 40) {
-			$newname = $username;
 			$nameerror = "Name too long";
+			$anyerrors = true;
 		}
-		else $username = $newname;
+		$username = $newname;
+		
 		$newemail = $_POST['email'];
 		if (!filter_var($newemail, FILTER_VALIDATE_EMAIL)) {
 			$emailerror = "Enter a valid email";
-			$newemail = $email;
+			$anyerrors = true;
 		}
-		else $email = $newemail;
+		$email = $newemail;
+		
 		$newphone = $_POST['phone'];
 		if (!preg_match("/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/", $newphone)) {
 			$phoneerror = "Phone number must be in the format xxx-xxx-xxxx";
-			$newphone = $phone;
+			$anyerrors = true;
 		}
-		else $phone = $newphone;
-		$sql = "update gymuser set name='" . $newname . "', email='" . $newemail. "', phone_number='"  . $newphone . "' where membership_id=".$mid;
-		$parse = OCI_Parse($db_conn, $sql);
-		$r = oci_execute($parse);
-		if(!$r) {
-			$personalerror = "Error updating info";
+		$phone = $newphone;
+		
+		if (!$anyerrors) {
+			$sql = "update gymuser set name='" . $newname . "', email='" . $newemail. "', phone_number='"  . $newphone . "' where membership_id=".$mid;
+			$parse = OCI_Parse($db_conn, $sql);
+			$r = oci_execute($parse);
+			if(!$r) {
+				$personalerror = "Error updating info";
+			}
 		}
 	}
 	else if (array_key_exists('newuser', $_POST)) {
@@ -120,59 +128,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	<title> Administration Home </title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="toggletab.js"></script>
+	<link rel="stylesheet" href="toggletab.css">
+	<link rel="stylesheet" href="forms.css">
 	<style>
-		body {
-			font-family: 'Helvetica';
-			font-size: 15px;
-		}
-		
-		#nav {
-			width: 100%;
-		}
-		
-		.tab {
-			width: 33%;
-			border-bottom: 2px solid #4489ff;
-			font-size: 25px;
-			color: #4489ff;
-			background-color: white;
-			display: inline-flex;
-		}
-		
-		.tab p {
-			margin-left: auto;
-			margin-right: auto;
-		}
-		
-		.tab:hover {
-			background-color:#aac9ff;
-			color: white;
-		}
-		
-		.tab.selected {
-			background-color: #4489ff;
-			color: white;
-		}
+	.header {
+		width: 100%;
+		height: 50px;
+		margin: 0 auto;
+		margin-top: 10px;
+		border-bottom: 3px solid #ff4545;
+		text-align: center;
+	}
+	
+	h2 {
+		color: #ff4545;
+		margin: 0 auto;
+	}
 	</style>
 </head>
 <body>
-	<p>Welcome, <?php echo $username ?></p>
+	<div class="header">
+		<h2> Admin </h2>
+		<p style="margin-top:5px;"><i>Welcome, <?php echo $username ?></i></p>
+	</div>
 	<div id="nav">
 		<div class="tab selected" id="personal"><p>Personal Info</p></div>
 		<div class="tab" id="gyms"><p>Manage Gyms</p></div>
 		<div class="tab" id="users"><p>Create Users</p></div>
 	</div>
 	<div class="view home" id="personal">
-		<form method="post"> 
-			<h3> Personal </h3>
-			<span style="color:red;"><?php echo $personalerror ?></span><br>
-			<label>Name: </label><span style="color:red;"><?php echo $nameerror ?></span><input name="name" type=text value="<?php echo $username ?>"><br>
-			<label>Email:</label><span style="color:red;"><?php echo $emailerror ?></span><input name="email" type=text value=<?php echo $email ?>><br>
-			<label>Phone number:</label><span style="color:red;"><?php echo $phoneerror ?></span><input name="phone" type=text value=<?php echo $phone ?>><br>
-			<input type=submit name="personal">
-		</form>
+		<div class="innerview">
+			<form method="post"> 
+				<h3> Personal </h3>
+				<span style="color:red;"><?php echo $personalerror ?></span><br>
+				<label>Name</label><input name="name" type=text value="<?php echo $username ?>"><span><?php echo $nameerror ?></span><br><br>
+				<label>Email</label><input name="email" type=text value=<?php echo $email ?>><span><?php echo $emailerror ?></span><br><br>
+				<label>Phone number</label><input name="phone" type=text value=<?php echo $phone ?>><span><?php echo $phoneerror ?></span><br><br>
+				<button type=submit name="personal">Update</button>
+			</form>
+		</div>
 	</div>
 	<div class="view" id="gyms">
+		<div class="innerview">
 		<?php 
 			$sql = "select gym_name, gym_location from gym where membership_id = $mid";
 			$parse = OCI_Parse($db_conn, $sql);
@@ -197,18 +194,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				echo "</ul>";
 			}
 		?>
+		</div>
 	</div>
 	<div class="view" id="users">
-		<h3> Users </h3>
-		<p> Create a new user </p>
-		<form method=post>
-			<span style="color:red;"><?php echo $usererror ?></span><br>
-			<label>Name: </label><span style="color:red;"><?php echo $nameerror ?></span><input name="name" type=text><br>
-			<label>Email:</label><span style="color:red;"><?php echo $emailerror ?></span><input name="email" type=text><br>
-			<label>Phone number:</label><span style="color:red;"><?php echo $phoneerror ?></span><input name="phone" type=text><br>
-			<label>User type: </label><br><input type="radio" name="utype" value="athlete" checked>Athlete<br><input type="radio" name="utype" value="trainer">Trainer<br><input type="radio" name="utype" value="admin">Admin<br>
-			<input type=submit name="newuser">
-		</form>
+		<div class="innerview">
+			<h3> Users </h3>
+			<p> Create a new user </p>
+			<form method=post>
+				<span style="color:red;"><?php echo $usererror ?></span><br>
+				<label>Name </label><input name="name" type=text value=<?php echo $u_name ?>><span><?php echo $nameerror ?></span><br><br>
+				<label>Email</label><input name="email" type=text value=<?php echo $u_email ?>><span><?php echo $emailerror ?></span><br><br>
+				<label>Phone number</label><input name="phone" type=text value=<?php echo $u_phone ?>><span><?php echo $phoneerror ?></span><br><br>
+				<label>User type </label><br><input type="radio" name="utype" value="athlete" checked>Athlete<br><input type="radio" name="utype" value="trainer">Trainer<br><input type="radio" name="utype" value="admin">Admin<br><br>
+				<button type=submit name="newuser">Create user</button>
+			</form>
+		</div>
 	</div>
 </body>
 </html>
