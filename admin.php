@@ -118,11 +118,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html>
 <head>
 	<title> Administration Home </title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="toggletab.js"></script>
+	<style>
+		body {
+			font-family: 'Helvetica';
+			font-size: 15px;
+		}
+		
+		#nav {
+			width: 100%;
+		}
+		
+		.tab {
+			width: 33%;
+			border-bottom: 2px solid #4489ff;
+			font-size: 25px;
+			color: #4489ff;
+			background-color: white;
+			display: inline-flex;
+		}
+		
+		.tab p {
+			margin-left: auto;
+			margin-right: auto;
+		}
+		
+		.tab:hover {
+			background-color:#aac9ff;
+			color: white;
+		}
+		
+		.tab.selected {
+			background-color: #4489ff;
+			color: white;
+		}
+	</style>
 </head>
 <body>
 	<p>Welcome, <?php echo $username ?></p>
-	
-	<div class="view" id="personal">
+	<div id="nav">
+		<div class="tab selected" id="personal"><p>Personal Info</p></div>
+		<div class="tab" id="gyms"><p>Manage Gyms</p></div>
+		<div class="tab" id="users"><p>Create Users</p></div>
+	</div>
+	<div class="view home" id="personal">
 		<form method="post"> 
 			<h3> Personal </h3>
 			<span style="color:red;"><?php echo $personalerror ?></span><br>
