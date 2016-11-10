@@ -2,8 +2,8 @@
 	include 'basesqlexecutors.php';
 	
 	$mid = $_GET['mid'];
-	$gymname = $_GET['gymname'];
-	$gymloc = $_GET['gymloc'];
+	$gymname = htmlspecialchars($_GET['gymname'], ENT_QUOTES);
+	$gymloc = htmlspecialchars($_GET['gymloc'], ENT_QUOTES);
 	if (!$mid || !$gymname || !$gymloc) {
 		header("Location: interface.php");
 	}
@@ -47,7 +47,8 @@
 			$row = oci_fetch_array($state);
 			$newid = $row[0] + 1;
 			
-			$sql = "insert into gymclass values($newid, '$name', '$cost', $mid, $trainer, '$gymname', '$gymloc')";
+			$sql = "insert into gymclass values($newid, '$name', $cost, $mid, $trainer, '$gymname', '$gymloc')";
+			echo $sql;
 			$result = OCI_Parse($db_conn, $sql);
 			$r = oci_execute($result);
 			if (!$r) {

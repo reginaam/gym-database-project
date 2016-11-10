@@ -3,13 +3,13 @@
 include 'basesqlexecutors.php';
 
 $mid = $_GET['mid'];
-$gym_name = $_GET['gymname'];
-$gym_loc = $_GET['gymloc'];
+$gym_name = htmlspecialchars($_GET['gymname'], ENT_QUOTES);
+$gym_loc = htmlspecialchars($_GET['gymloc'], ENT_QUOTES);
 if (!$gym_name || !$gym_loc || !$mid) {
 	header("Location: interface.php");
 }
 
-$sql = "select city, membership_id from gym where gym_name='".$gym_name."' and gym_location='".$gym_loc."'";
+$sql = "select city, membership_id from gym where gym_name='$gym_name' and gym_location='$gym_loc'";
 $result = OCI_Parse($db_conn, $sql);
 oci_execute($result);
 $row = oci_fetch_array($result);
@@ -51,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	<title> Edit Gym </title>
 </head>
 <body>
-	<h3> Edit Class at <?php echo "$gym_name, $gym_loc"?></h3>
+	<h3> Edit <?php echo "$gym_name at $gym_loc"?></h3>
 	<form method="post">
 		<span style="color:red;"><?php echo $errors ?></span>
 		<label> City: </label><span style="color:red;"><?php echo $cityerror ?></span><input type=text name="city" value="<?php echo $city ?>"><br>

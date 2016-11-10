@@ -24,7 +24,7 @@ $costerror = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$anyerrors = false;
-	$newname = $_POST['name'];
+	$newname = htmlspecialchars($_POST['name'], ENT_QUOTES);
 	if (strlen($newname) > 80) {
 		$newname = $name;
 		$nameerror = "Name too long";
@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	
 	$newtrainer = $_POST['trainer'];
 	if (!$anyerrors) {
-		$sql = "update gymclass set name='".$newname."', cost=".$newcost.", trainer_membership_id=".$newtrainer." where class_id=$cid";
+		$sql = "update gymclass set name='$newname', cost=$newcost, trainer_membership_id=$newtrainer where class_id=$cid";
 		$result = OCI_Parse($db_conn, $sql);
 		$r = oci_execute($result);
 		if (!$r) {

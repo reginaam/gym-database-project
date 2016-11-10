@@ -28,14 +28,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	// Personal section
 	if (array_key_exists('personal', $_POST)) {
 		$anyerrors = false;
-		$newname = $_POST['name'];
+		$newname = htmlspecialchars($_POST['name'], ENT_QUOTES);
 		if (strlen($newname)> 40) {
 			$nameerror = "Name too long";
 			$anyerrors = true;
 		}
 		$username = $newname;
 		
-		$newemail = $_POST['email'];
+		$newemail = htmlspecialchars($_POST['email']);
 		if (!filter_var($newemail, FILTER_VALIDATE_EMAIL)) {
 			$emailerror = "Enter a valid email";
 			$anyerrors = true;
@@ -65,12 +65,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			$nameerror = "Name too long";
 			$anyerrors = true;
 		}
-		$u_email = htmlspecialchars($_POST['email'], ENT_QUOTES);
+		$u_email = htmlspecialchars($_POST['email']);
 		if (!filter_var($u_email, FILTER_VALIDATE_EMAIL)) {
 			$emailerror = "Enter a valid email";
 			$anyerrors = true;
 		}
-		$u_phone = htmlspecialchars($_POST['phone'], ENT_QUOTES);
+		$u_phone = htmlspecialchars($_POST['phone']);
 		if (!preg_match("/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/", $u_phone)) {
 			$phoneerror = "Phone number must be in the format xxx-xxx-xxxx";
 			$anyerrors = true;
@@ -125,9 +125,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="UTF-8">
 	<title> Administration Home </title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="toggletab.js"></script>
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
 	<link rel="stylesheet" href="toggletab.css">
 	<link rel="stylesheet" href="forms.css">
 	<style>
@@ -143,6 +146,63 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	h2 {
 		color: #ff4545;
 		margin: 0 auto;
+	}
+	
+	.newgymbutton {
+		font-size: 25px;
+		font-weight: bold;
+		border: none;
+		background-color: transparent;
+		color: #a1a1a1;	
+	}
+	
+	.newgymbutton:hover {
+		color: #0eff00;	
+		cursor: pointer;
+	}
+	
+	.editgymbutton {
+		border: none;
+		background-color: transparent;
+		color: #a1a1a1;	
+	}
+	
+	.editgymbutton:hover {
+		color: #4489ff;	
+		cursor: pointer;
+	}
+	
+	ul {
+		text-align: left;
+	}
+	
+	li {
+		list-style-type: none;
+		padding: 7px;
+	}
+	
+	.gymlist {
+		color: #4489ff;
+	}
+	
+	.gymlist:nth-child(even) {
+		background-color: #f1f1f1;
+	}
+	
+	.gymlist:nth-child(odd) {
+		background-color: #e2e7ff;
+	}
+	
+	.classlist {
+		color: #ff4545;
+	}
+	
+	.classlist:nth-child(odd) {
+		background-color: #f1f1f1;
+	}
+
+	.classlist:nth-child(even) {
+		background-color: #ffe9e9;
 	}
 	</style>
 </head>
@@ -178,15 +238,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				echo "<span style='color:red';> Could not get gym info";
 			}
 			else {
-				echo "<h3> Gyms </h3><form method=get action='newgym.php'><input type=hidden name='mid' value=$mid><button type='submit'>New Gym</button></form><ul>";
+				echo "<h3 style='display: inline-block';> Gyms </h3><form method=get action='newgym.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><button type='submit' class='newgymbutton'>+</button></form><hr><ul style='width: 85%; margin: 0 auto;'>";
 				while (($row = oci_fetch_array($parse, OCI_BOTH)) != false) {
-					echo "<li>" . $row[0] . ", " . $row[1] . " <form method=get action='editgym.php'><input type=hidden name='gymname' value='" . $row[0] . "'><input type=hidden name='gymloc' value='" . $row[1] . "'><input type=hidden name='mid' value=$mid><button type='submit'>Edit Gym</button></form><br><p>Classes</p><form method=get action='newclass.php'><input type=hidden name='mid' value=$mid><input type=hidden name='gymname' value='". $row[0] ."'><input type=hidden name='gymloc' value='".$row[1]."'><button type='submit'>New Class</button></form><ul>";
-					$sql = "select distinct gc.class_id, gc.name, gc.cost, t.name from gymclass gc, gymuser t where gc.gym_name = '".$row[0]."' and gc.gym_location = '". $row[1]."' and gc.trainer_membership_id = t.membership_id order by gc.name";
+					$gymname  = $row[0];
+					$gymloc = $row[1];
+					echo "<li class='gymlist'><p style='display:inline-block;'>$gymname, $gymloc</p><form method=get action='editgym.php' style='display:inline-block;'><input type=hidden name='gymname' value='$gymname'><input type=hidden name='gymloc' value='$gymloc'><input type=hidden name='mid' value=$mid><button type='submit' class='editgymbutton' ><i class='material-icons'>create</i></button></form><hr><ul><li><p style='color:101010; display: inline-block;'>Classes</p><form method=get action='newclass.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><input type=hidden name='gymname' value='$gymname'><input type=hidden name='gymloc' value='$gymloc'><button type='submit' class='newgymbutton'>+</button></form></li>";
+					$sql = "select distinct gc.class_id, gc.name, gc.cost, t.name from gymclass gc, gymuser t where gc.gym_name = '$gymname' and gc.gym_location = '$gymloc' and gc.trainer_membership_id = t.membership_id order by gc.name";
 					$parseclass = OCI_Parse($db_conn, $sql);
 					oci_execute($parseclass);
 					
 					while (($classrow = oci_fetch_array($parseclass, OCI_BOTH)) != false) {
-						echo "<li>" . $classrow[1] . " with " . $classrow[3] . ", $" . $classrow[2] . "<form method=get action='editclass.php'><input type=hidden name='classid' value=" . $classrow[0] . "><input type=hidden name='mid' value=$mid><button type='submit'>Edit class</button></form><br></li>";
+						$cid = $classrow[0];
+						$classname = $classrow[1];
+						$cost = $classrow[2];
+						$tname = $classrow[3];
+						echo "<li class='classlist'><p style='display:inline-block;'>$classname with $tname, $$cost</p><form method=get action='editclass.php' style='display:inline-block;'><input type=hidden name='classid' value=$cid><input type=hidden name='mid' value=$mid><button type='submit' class='editgymbutton'><i class='material-icons'>create</i></button></form><br></li>";
 					}
 					
 					echo "</ul></li>";
@@ -205,7 +271,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				<label>Name </label><input name="name" type=text value=<?php echo $u_name ?>><span><?php echo $nameerror ?></span><br><br>
 				<label>Email</label><input name="email" type=text value=<?php echo $u_email ?>><span><?php echo $emailerror ?></span><br><br>
 				<label>Phone number</label><input name="phone" type=text value=<?php echo $u_phone ?>><span><?php echo $phoneerror ?></span><br><br>
-				<label>User type </label><br><input type="radio" name="utype" value="athlete" checked>Athlete<br><input type="radio" name="utype" value="trainer">Trainer<br><input type="radio" name="utype" value="admin">Admin<br><br>
+				<label>User type </label><input type="radio" name="utype" value="athlete" checked>Athlete<br><input type="radio" name="utype" value="trainer">Trainer<br><input type="radio" name="utype" value="admin">Admin<br><br>
 				<button type=submit name="newuser">Create user</button>
 			</form>
 		</div>
