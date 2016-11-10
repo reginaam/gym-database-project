@@ -24,7 +24,7 @@ $cityerror = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$anyerrors = false;
 	
-	$newcity = $_POST['city'];
+	$newcity = htmlspecialchars($_POST['city'], ENT_QUOTES);
 	if (strlen($newcity)> 40) {
 		$cityerror = "City name is too long";
 		$anyerrors = true;
@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$newadmin = $_POST['admin'];
 	
 	if (!$anyerrors) {
-		$sql = "update gym set city='".$newcity."', membership_id=".$newadmin." where gym_name='".$gym_name."' and gym_location='".$gym_loc."'";
+		$sql = "update gym set city='$newcity', membership_id=$newadmin where gym_name='$gym_name' and gym_location='$gym_loc'";
 		$result = OCI_Parse($db_conn, $sql);
 		$r = oci_execute($result);
 		if (!$r) {

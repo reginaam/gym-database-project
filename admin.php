@@ -52,17 +52,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	}
 	else if (array_key_exists('newuser', $_POST)) {
 		$anyerrors = false;
-		$u_name = $_POST['name'];
+		$u_name = htmlspecialchars($_POST['name'], ENT_QUOTES);
 		if (strlen($u_name)> 40) {
 			$nameerror = "Name too long";
 			$anyerrors = true;
 		}
-		$u_email = $_POST['email'];
+		$u_email = htmlspecialchars($_POST['email'], ENT_QUOTES);
 		if (!filter_var($u_email, FILTER_VALIDATE_EMAIL)) {
 			$emailerror = "Enter a valid email";
 			$anyerrors = true;
 		}
-		$u_phone = $_POST['phone'];
+		$u_phone = htmlspecialchars($_POST['phone'], ENT_QUOTES);
 		if (!preg_match("/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/", $u_phone)) {
 			$phoneerror = "Phone number must be in the format xxx-xxx-xxxx";
 			$anyerrors = true;
