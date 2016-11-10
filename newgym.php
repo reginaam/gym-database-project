@@ -22,7 +22,6 @@
 		$anyerrors = false;
 		
 		$name = htmlspecialchars($_POST['name'], ENT_QUOTES);
-		echo $name;
 		if (strlen($name) > 80) {
 			$anyerrors = true;
 			$nameerror = "Name too long";
@@ -42,7 +41,6 @@
 		
 		if (!$anyerrors) {
 			$sql = "insert into gym values('$name', '$loc', '$city', $mid)";
-			echo $sql;
 			$result = OCI_Parse($db_conn, $sql);
 			$r = oci_execute($result);
 			if (!$r) {
