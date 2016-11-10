@@ -63,13 +63,15 @@
 <html>
 <head>
 	<title> New Class </title>
+	<link rel="stylesheet" href="forms.css">
+	<link rel="stylesheet" href="subforms.css">
 </head>
 <body>
-<h3> Create a new class for <?php echo $gymname ?></h3>
+<h3> Create a new class for <?php echo $gymname ?></h3><br>
 <form method=post>
 	<span style="color:red;"><?php echo $errors ?></span>
-	<label> Name: </label><span style="color:red;"><?php echo $nameerror ?></span><input type="text" name="name"><br>
-	<label> Cost: </label><span style="color:red;"><?php echo $costerror ?></span><input type="text" name="cost"><br>
+	<label> Name: </label><span style="color:red;"><?php echo $nameerror ?></span><input type="text" name="name"><br><br>
+	<label> Cost: </label><span style="color:red;"><?php echo $costerror ?></span><input type="text" name="cost"><br><br>
 	<label> Trainer: </label><select name="trainer"> 
 		<?php 
 			$sql = "select name, trainer.membership_id from gymuser, trainer where trainer.membership_id = gymuser.membership_id order by name";
@@ -84,6 +86,7 @@
 				echo "<option value='".$row[1]."' ".$selected.">".$row[0]."</option>";
 			}
 		?></select>
+		<br><br>
 	<button type=submit> Create </button>
 </form>
 </body>

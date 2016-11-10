@@ -55,14 +55,16 @@
 <html>
 <head>
 	<title> New Gym </title>
+	<link rel="stylesheet" href="forms.css">
+	<link rel="stylesheet" href="subforms.css">
 </head>
 <body>
-<h3> Create a new Gym </h3>
+<h3> Create a new Gym </h3><br>
 <form method=post>
 	<span style="color:red;"><?php echo $errors ?></span>
-	<label> Name: </label><span style="color:red;"><?php echo $nameerror ?></span><input type="text" name="name"><br>
-	<label> Location: </label><span style="color:red;"><?php echo $locerror ?></span><input type="text" name="loc"><br>
-	<label> City: </label><span style="color:red;"><?php echo $cityerror ?></span><input type="text" name="city"><br>
+	<label> Name: </label><span style="color:red;"><?php echo $nameerror ?></span><input type="text" name="name"><br><br>
+	<label> Location: </label><span style="color:red;"><?php echo $locerror ?></span><input type="text" name="loc"><br><br>
+	<label> City: </label><span style="color:red;"><?php echo $cityerror ?></span><input type="text" name="city"><br><br>
 	<button type=submit> Create </button>
 </form>
 </body>

@@ -158,6 +158,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	
 	.newgymbutton:hover {
 		color: #0eff00;	
+		background-color: transparent;
 		cursor: pointer;
 	}
 	
@@ -169,6 +170,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	
 	.editgymbutton:hover {
 		color: #4489ff;	
+		background-color: transparent;
 		cursor: pointer;
 	}
 	

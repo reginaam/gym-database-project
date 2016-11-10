@@ -57,13 +57,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html>
 <head>
 	<title> Edit Class </title>
+	<link rel="stylesheet" href="forms.css">
+	<link rel="stylesheet" href="subforms.css">
 </head>
 <body>
-	<h3> Edit Class at <?php echo "$gym_name, $gym_loc"?></h3>
+	<h3> Edit Class at <?php echo "$gym_name, $gym_loc"?></h3><br>
 	<form method="post">
 		<span style="color:red;"><?php echo $errors ?></span>
-		<label> Name: </label><span style="color:red;"><?php echo $nameerror ?></span><input type=text name="name" value="<?php echo $name ?>"><br>
-		<label> Cost: </label><span style="color:red;"><?php echo $costerror ?></span><input type=text name="cost" value=<?php echo $cost ?>><br>
+		<label> Name: </label><span style="color:red;"><?php echo $nameerror ?></span><input type=text name="name" value="<?php echo $name ?>"><br><br>
+		<label> Cost: </label><span style="color:red;"><?php echo $costerror ?></span><input type=text name="cost" value=<?php echo $cost ?>><br><br>
 		<label> Trainer: </label><select name="trainer"> 
 		<?php 
 			$sql = "select name, trainer.membership_id from gymuser, trainer where trainer.membership_id = gymuser.membership_id order by name";
@@ -78,6 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				echo "<option value='".$row[1]."' ".$selected.">".$row[0]."</option>";
 			}
 		?></select>
+		<br><br>
 		<button type="submit">Update</button>
 	</form>
 </body>

@@ -49,12 +49,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html>
 <head>
 	<title> Edit Gym </title>
+	<link rel="stylesheet" href="forms.css">
+	<link rel="stylesheet" href="subforms.css">
 </head>
 <body>
+	<div class="container">
 	<h3> Edit <?php echo "$gym_name at $gym_loc"?></h3>
+	<br><br>
 	<form method="post">
 		<span style="color:red;"><?php echo $errors ?></span>
-		<label> City: </label><span style="color:red;"><?php echo $cityerror ?></span><input type=text name="city" value="<?php echo $city ?>"><br>
+		<label> City: </label><span style="color:red;"><?php echo $cityerror ?></span><input type=text name="city" value="<?php echo $city ?>"><br><br>
 		<label> Admin: </label><select name="admin"> 
 		<?php 
 			$sql = "select name, gymadmin.membership_id from gymuser, gymadmin where gymadmin.membership_id = gymuser.membership_id order by name";
@@ -69,7 +73,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				echo "<option value='".$row[1]."' ".$selected.">".$row[0]."</option>";
 			}
 		?></select>
+		<br><br>
 		<button type="submit">Update</button>
 	</form>
+	</div>
 </body>
 </html>

@@ -1,0 +1,12 @@
+body *{
+	margin: 0 auto;
+	text-align: center;
+}
+	
+.container {
+	width: 50%;
+}
+	
+h3 {
+	color: #ff4545;	
+}
