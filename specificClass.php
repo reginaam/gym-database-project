@@ -56,8 +56,8 @@
 		</div>
 
 		<div>
-			<form method="post" action="viewClasses.php">
-				<input type="submit" value="Sign me up!">
+			<form method="post" action="athlete.php">
+				<input type="submit" value="Sign me up!" name="signUp">
 			</form>
 		</div>
 	</body>
@@ -111,5 +111,12 @@ function printCost($result){
 	}
 }
 
+// need to get the class id and the athlete id and insert the 2 values into Attends
+/*if (array_key_exists('signUp', $_POST)){
+	$cost = executePlainSQL("select cost, class_id from GymClass where class_id='$classID'");
+	executePlainSQL("insert into Attends values()");
+}*/
+
+// Could additionally get the exercises info but not necessary
 
 ?>

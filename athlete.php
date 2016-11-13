@@ -1,29 +1,3 @@
-<!DOCTYPE html>
-
-<!-- Comments here
-	head contains information
-	title is the title of the page or the tab
-	body contains the actual info
-	<h1> is title header
-	<p> is new paragraph
-	<hr> gives horizontal line
-	<br> starts a new line
-	<a href="[some website here]">[Click here!]</a> takes you to [some website] when [Click here!] link is pressed 
-	<ul> <li> </li> </ul> creates a bullet pointed unordered list and each element wrapped in li tag
-	<ol> used for numbered or ordered lists
-	<img src="[location]" width="200" height="100" alt="My image" /> displays image from [location] with width and height and for 	text only browsers, image displayed as "My image"
-	<div> </div> use to separate parts of page
-	html entities to find useful html stuff like copywrite symbols
-	can give a tag a unique ID by saying ex. <div id="[id]"> which allows us to identify header by id
-	can give tag a class also by saying ex. <div class="[class]"> which allows us to identify element(s) by class
-		use classes and ids for style sheet purposes
-	<span class="red">[word</span]> allows word to be grouped under class red, can insert in the middle of a line
-	<[tag] style="[property:value;]" changes specified property of tag to specified style
-	check out formatting text, not important and can add later
-	<q> for indented quotations
-	<address> for contact information
--->
-
 <html>
 
 	<head>
@@ -32,16 +6,22 @@
 
 	<body>
 		<div>
-			<h1> Welcome athlete! </h1>
+			
+			<?php
+				include 'basesqlexecutors.php';
+				$membershipID = $_GET['membershipID'];
+				$memberInfo = executePlainSQL("select * from GymUser where membership_id=$membershipID");
+				printInfo($memberInfo);
+			?>
+			
 		</div>
 
 		<div>
 			<h2> Classes in which you are currently enrolled: </h2>
-			<ul>
-				<li><a href="specificClass.php">Class 1</a></li>
-				<li><a href="specificClass.php">Class 2</a></li>
-			</ul>
-			
+				<?php
+					$enrolledClasses = executePlainSQL("select gc.name, gc.class_id, a.class_id, a.membership_id from GymClass gc, Attends a where gc.class_id=a.class_id and membership_id=$membershipID");
+					printClasses($enrolledClasses);
+				?>
 			<hr />	
 		</div>
 		
@@ -52,3 +32,25 @@
 
 	</body>
 </html>
+
+<?php
+
+function printInfo($result){
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		echo "<h1>Welcome " . $row["NAME"] . "!</h1>";
+		echo "<p><b>ID: </b><i>" . $row["MEMBERSHIP_ID"] . "</i><br>";
+		echo "<b>Email: </b><i>" . $row["EMAIL"] . "</i><br>";
+		echo "<b>Phone Number: </b><i>" . $row["PHONE_NUMBER"] . "</i></p>";
+		echo "<hr>";
+	}
+}
+
+function printClasses($result){
+	echo "<p><ul>";
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)){
+		echo "<li><a href='specificClass.php?classID=" .$row["CLASS_ID"] . "'>" . $row["NAME"] . "</li>";
+	}
+	echo "</ul></p>";
+}
+
+?>
