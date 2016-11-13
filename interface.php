@@ -28,7 +28,7 @@
 		 $countathlete = $rowathlete[0];
 		 
 		 if ($countathlete == 1) {
-			 header("Location: athlete.php?$membership");
+			 header("Location: athlete.php?membershipID=$membership");
 		 }
 
 		 $resulttrainer = executePlainSQL($sqltrainer);
