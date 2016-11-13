@@ -20,7 +20,7 @@
 		 $countadmin = $rowadmin[0];
 		 
 		 if ($countadmin == 1) {
-			 header("Location: admin.php?$membership");
+			 header("Location: admin.php?mid=$membership");
 		 }
 
 		 $resultathlete = executePlainSQL($sqlathlete);
@@ -28,7 +28,11 @@
 		 $countathlete = $rowathlete[0];
 		 
 		 if ($countathlete == 1) {
+<<<<<<< HEAD
 			 header("Location: athlete.php?membershipID=$membership");
+=======
+			 header("Location: athlete.php?mid=$membership");
+>>>>>>> 0587cdcb6b2cc89321fa98797f266461621205d2
 		 }
 
 		 $resulttrainer = executePlainSQL($sqltrainer);
@@ -36,7 +40,7 @@
 		 $counttrainer = $rowtrainer[0];
 		 
 		 if ($counttrainer == 1) {
-			 header("Location: trainer.php?$membership");
+			 header("Location: trainer.php?mid=$membership");
 		 }
 		 
 		 $error = "Membership ID invalid";
