@@ -9,7 +9,7 @@
 			
 			<?php
 				include 'basesqlexecutors.php';
-				$membershipID = $_GET['membershipID'];
+				$membershipID = $_GET['mid'];
 				$memberInfo = executePlainSQL("select * from GymUser where membership_id=$membershipID");
 				printInfo($memberInfo);
 			?>

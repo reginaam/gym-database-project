@@ -28,11 +28,10 @@
 		 $countathlete = $rowathlete[0];
 		 
 		 if ($countathlete == 1) {
-<<<<<<< HEAD
-			 header("Location: athlete.php?membershipID=$membership");
-=======
 			 header("Location: athlete.php?mid=$membership");
->>>>>>> 0587cdcb6b2cc89321fa98797f266461621205d2
+
+			 header("Location: athlete.php?mid=$membership");
+
 		 }
 
 		 $resulttrainer = executePlainSQL($sqltrainer);
