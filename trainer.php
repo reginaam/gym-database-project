@@ -148,7 +148,7 @@
         margin: 0 auto;
     }
 
-.newclassbutton {
+.newbutton {
     font-size: 25px;
     font-weight: bold;
     border: none;
@@ -156,19 +156,19 @@
     color: #a1a1a1;
 }
 
-.newclassbutton:hover {
+.newbutton:hover {
     color: #0eff00;
     background-color: transparent;
     cursor: pointer;
 }
 
-.editclassbutton {
+.editbutton {
     border: none;
     background-color: transparent;
     color: #a1a1a1;
 }
 
-.editclassbutton:hover {
+.editbutton:hover {
     color: #4489ff;
     background-color: transparent;
     cursor: pointer;
@@ -221,34 +221,26 @@ li {
 <div class="view" id="classes">
 <div class="innerview">
 <?php
-    $sql = "select name, gym_name, gym_location from GymClass where trainer_membership_id = $mid";
+    $sql = "select distinct c.class_id, c.name, c.gym_name, c.gym_location, s.class_date, s.start_time, s.end_time, c.cost from GymClass c, FollowSchedule s where trainer_membership_id = $mid AND c.class_id = s.class_id order by name";
     $parse = OCI_Parse($db_conn, $sql);
     $r = oci_execute($parse);
     if (!$r) {
         echo "<span style='color:red';> Could not get class info";
     }
     else {
-        echo "<h3 style='display: inline-block';> Classes </h3><form method=get action='newclass.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><button type='submit' class='newclassbutton'>+</button></form><hr><ul style='width: 85%; margin: 0 auto;'>";
+        echo "<h3 style='display: inline-block';> Classes </h3><form method=get action='newclass.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><button type='submit' class='newbutton'>+</button></form><hr><ul style='width: 85%; margin: 0 auto;'>";
         while (($row = oci_fetch_array($parse, OCI_BOTH)) != false) {
-            $classname  = $row[0];
-            $gymname = $row[1];
-            $gymloc = $row[2];
-            echo "<li class='classlist'><p style='display:inline-block;'>$classname, $gymname,$gymloc</p><form method=get action='editclass.php' style='display:inline-block;'><input type=hidden name='classname' value='$classname'><input type=hidden name='gymname' value='$gymname'><input type=hidden name='gymloc' value='$gymloc'><input type=hidden name='mid' value=$mid><button type='submit' class='editclassbutton' ><i class='material-icons'>create</i></button></form><hr><ul><li><p style='color:101010; display: inline-block;'>Classes</p><form method=get action='newclass.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><input type=hidden name='classname' value='$classname'><input type=hidden name='gynname' value='$gymname'><input type=hidden name='gymloc' value='$gymloc'><button type='submit' class='newclassbutton'>+</button></form></li>";
-            $sql = "select distinct gc.class_id, gc.name, gc.cost, t.name from gymclass gc, gymuser t where gc.gym_name = '$gymname' and gc.gym_location = '$gymloc' and gc.trainer_membership_id = t.membership_id order by gc.name";
-            $parseclass = OCI_Parse($db_conn, $sql);
-            oci_execute($parseclass);
-            
-            while (($classrow = oci_fetch_array($parseclass, OCI_BOTH)) != false) {
-                $cid = $classrow[0];
-                $classname = $classrow[1];
-                $cost = $classrow[2];
-                $tname = $classrow[3];
-                echo "<li class='classlist'><p style='display:inline-block;'>$classname with $tname, $$cost</p><form method=get action='editclass.php' style='display:inline-block;'><input type=hidden name='classid' value=$cid><input type=hidden name='mid' value=$mid><button type='submit' class='editgymbutton'><i class='material-icons'>create</i></button></form><br></li>";
-            }
-            
-            echo "</ul></li>";
+            $cid = $row[0];
+            $classname  = $row[1];
+            $gymname = $row[2];
+            $gymloc = $row[3];
+            $date = $row[4];
+            $start = $row[5];
+            $end = $row[6];
+            $cost = $row[7];
+            echo "<li class='classlist'><p style='display:inline-block;'>$classname | $gymname,$gymloc | $date, $start-$end | $$cost</p><form method=get action='editclass.php' style='display:inline-block;'><input type=hidden name='classid' value='$cid'><input type=hidden name='mid' value=$mid><button type='submit' class='editbutton' ><i class='material-icons'>create</i></button></form><br></li>";
         }
-        echo "</ul>";
+        echo "</ul></li>";
     }
     ?>
 </div>
@@ -256,28 +248,29 @@ li {
 <div class="view" id="routines">
 <div class="innerview">
 <?php
-    $sql = "select routine_name, intensity, sets, reps from Routine where membership_id = $mid";
+    $sql = "select routine_name, intensity, sets, reps from Routine where membership_id = $mid order by intensity";
     $parse = OCI_Parse($db_conn, $sql);
     $r = oci_execute($parse);
     if (!$r) {
         echo "<span style='color:red';> Could not get routine info";
     }
     else {
-        echo "<h3 style='display: inline-block';> Routines </h3><form method=get action='newroutine.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><button type='submit' class='newroutinebutton'>+</button></form><hr><ul style='width: 85%; margin: 0 auto;'>";
+        echo "<h3 style='display: inline-block';> Routines </h3><form method=get action='newroutine.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><button type='submit' class='newbutton'>+</button></form><hr><ul style='width: 85%; margin: 0 auto;'>";
         while (($row = oci_fetch_array($parse, OCI_BOTH)) != false) {
-            $gymname  = $row[0];
-            $gymloc = $row[1];
-            echo "<li class='gymlist'><p style='display:inline-block;'>$gymname, $gymloc</p><form method=get action='editgym.php' style='display:inline-block;'><input type=hidden name='gymname' value='$gymname'><input type=hidden name='gymloc' value='$gymloc'><input type=hidden name='mid' value=$mid><button type='submit' class='editgymbutton' ><i class='material-icons'>create</i></button></form><hr><ul><li><p style='color:101010; display: inline-block;'>Classes</p><form method=get action='newclass.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><input type=hidden name='gymname' value='$gymname'><input type=hidden name='gymloc' value='$gymloc'><button type='submit' class='newgymbutton'>+</button></form></li>";
-            $sql = "select distinct gc.class_id, gc.name, gc.cost, t.name from gymclass gc, gymuser t where gc.gym_name = '$gymname' and gc.gym_location = '$gymloc' and gc.trainer_membership_id = t.membership_id order by gc.name";
-            $parseclass = OCI_Parse($db_conn, $sql);
-            oci_execute($parseclass);
+            $routinename  = $row[0];
+            $intensity = $row[1];
+            $sets = $row[2];
+            $reps = $row[3];
+            echo "<li class='routinelist'><p style='display:inline-block;'>$routinename | Difficulty: $intensity | Sets: $sets | Reps: $reps</p><form method=get action='editroutine.php' style='display:inline-block;'><input type=hidden name='routinename' value='$routinename'><input type=hidden name='intensity' value='$intensity'><input type=hidden name='mid' value=$mid><button type='submit' class='editbutton' ><i class='material-icons'>create</i></button></form><hr><ul><li><p style='color:101010; display: inline-block;'>Exercises</p><form method=get action='newexercise.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><input type=hidden name='routinename' value=$routinename><input type=hidden name='intensity' value=$intensity><button type='submit' class='newbutton'>+</button></form><hr></li>";
+            $sql = "select exercise_name, body_part, benefit from exercise where routine_name = '$routinename' AND intensity = $intensity";
+            $parseexercise = OCI_Parse($db_conn, $sql);
+            oci_execute($parseexercise);
             
-            while (($classrow = oci_fetch_array($parseclass, OCI_BOTH)) != false) {
-                $cid = $classrow[0];
-                $classname = $classrow[1];
-                $cost = $classrow[2];
-                $tname = $classrow[3];
-                echo "<li class='classlist'><p style='display:inline-block;'>$classname with $tname, $$cost</p><form method=get action='editclass.php' style='display:inline-block;'><input type=hidden name='classid' value=$cid><input type=hidden name='mid' value=$mid><button type='submit' class='editgymbutton'><i class='material-icons'>create</i></button></form><br></li>";
+            while (($exerciserow = oci_fetch_array($parseexercise, OCI_BOTH)) != false) {
+                $exercisename = $exerciserow[0];
+                $body = $exerciserow[1];
+                $benefit = $exerciserow[2];
+                echo "<li class='exerciselist'><p style='display:inline-block;'>$exercisename | $body | $benefit</p><form method=get action='editexercise.php' style='display:inline-block;'><input type=hidden name='exercisename' value=$exercisename><input type=hidden name='bodypart' value=$body><input type=hidden name='mid' value=$mid><button type='submit' class='editbutton'><i class='material-icons'>create</i></button></form><br></li>";
             }
             
             echo "</ul></li>";

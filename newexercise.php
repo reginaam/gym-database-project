@@ -2,7 +2,9 @@
 	include 'basesqlexecutors.php';
 	
 	$mid = $_GET['mid'];
-	if (!$mid) {
+    $rname = $_GET['routinename'];
+    $intensity = $_GET['intensity'];
+	if (!$mid || !$rname || !$intensity) {
 		header("Location: interface.php");
 	}
 	
@@ -15,6 +17,8 @@
 	
 	$errors = "";
 	$nameerror = "";
+    $bodyerror = "";
+    $benefiterror = "";
 	
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$anyerrors = false;
@@ -24,21 +28,25 @@
 			$anyerrors = true;
 			$nameerror = "Name too long";
 		}
-		
-		$intensity = $_POST['intensity'];
-		
-        $sets = $_POST['sets'];
         
-        $reps = $_POST['reps'];
+        $body = htmlspecialchars($_POST['body'], ENT_QUOTES);
+        if (strlen($name) > 20) {
+            $anyerrors = true;
+            $bodyerror = "Body Part too long";
+        }
         
-        $class = $_POST['class'];
+        $benefit = htmlspecialchars($_POST['benefit'], ENT_QUOTES);
+        if (strlen($name) > 500) {
+            $anyerrors = true;
+            $benefiterror = "Benefit too long";
+        }
 		
 		if (!$anyerrors) {
-			$sql = "insert into routine values('$name', '$intensity', '$sets', '$reps', '$mid', '$class')";
+			$sql = "insert into exercise values('$name', '$body', '$benefit', '$rname', '$intensity', '$mid')";
 			$result = OCI_Parse($db_conn, $sql);
 			$r = oci_execute($result);
 			if (!$r) {
-				$errors = "Failed to create Routine";
+				$errors = "Failed to create Exercise";
 			} else {
 				header("Location: trainer.php?mid=$mid");
 			}
@@ -48,19 +56,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title> New Routine </title>
+	<title> New Exercise </title>
 	<link rel="stylesheet" href="forms.css">
 	<link rel="stylesheet" href="subforms.css">
 </head>
 <body>
-<h3> Create a new Routine </h3><br>
+<h3> Create a new Exercise for <?php echo "$rname, $intensity"?></h3><br>
 <form method=post>
 	<span style="color:red;"><?php echo $errors ?></span>
 	<label> Name: </label><span style="color:red;"><?php echo $nameerror ?></span><input type="text" name="name"><br><br>
-    <label> Intensity: </label><input type=int name="intensity" value="<?php echo $intensity ?>"><br><br>
-    <label> Sets: </label><input type=int name="sets" value="<?php echo $sets ?>"><br><br>
-    <label> Reps: </label><input type=int name="reps" value="<?php echo $reps ?>"><br><br>
-    <label> Class ID: </label><input type=int name="class" value="<?php echo $class ?>"><br><br>
+    <label> Body Part: </label><span style="color:red;"><?php echo $bodyerror ?></span><input type="text" name="body"><br><br>
+    <label> Benefit: </label><span style="color:red;"><?php echo $benefiterror ?></span><input type="text" name="benefit"><br><br>
 	<button type=submit> Create </button>
 </form>
 </body>
