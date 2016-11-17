@@ -6,7 +6,7 @@ $mid = $_GET['mid'];
 $name = $_GET['exercisename'];
 $body = $_GET['bodypart'];
 if (!$mid || !$name || !$body) {
-	header("Location: interface.php");
+	header("Location: index.php");
 }
 
 $sql = "select exercise_name, body_part, benefit from exercise where exercise_name=$name and body_part = $body";

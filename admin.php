@@ -3,7 +3,7 @@ include 'basesqlexecutors.php';
 
 $mid = $_GET['mid'];
 if (!$mid) {
-	header("Location: interface.php");
+	header("Location: index.php");
 }
 
 // -----------------------
