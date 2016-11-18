@@ -6,7 +6,7 @@ $mid = $_GET['mid'];
 $name = $_GET['routinename'];
 $intensity = $_GET['intensity'];
 if (!$mid || !$name || !$intensity) {
-	header("Location: interface.php");
+	header("Location: index.php");
 }
 
 $sql = "select routine_name, intensity, sets, reps from routine where routine_name=$name AND intensity = $intensity";

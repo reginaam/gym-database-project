@@ -6,7 +6,7 @@ $mid = $_GET['mid'];
 $gym_name = htmlspecialchars($_GET['gymname'], ENT_QUOTES);
 $gym_loc = htmlspecialchars($_GET['gymloc'], ENT_QUOTES);
 if (!$gym_name || !$gym_loc || !$mid) {
-	header("Location: interface.php");
+	header("Location: index.php");
 }
 
 $sql = "select city, membership_id from gym where gym_name='$gym_name' and gym_location='$gym_loc'";
@@ -14,7 +14,7 @@ $result = OCI_Parse($db_conn, $sql);
 oci_execute($result);
 $row = oci_fetch_array($result);
 if ($row[1] != $mid) {
-	header("Location: interface.php");
+	header("Location: index.php");
 }
 $city = $row[0];
 

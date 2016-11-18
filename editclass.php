@@ -5,7 +5,7 @@ include 'basesqlexecutors.php';
 $mid = $_GET['mid'];
 $cid = $_GET['classid'];
 if (!$mid || !$cid) {
-	header("Location: interface.php");
+	header("Location: index.php");
 }
 
 $sql = "select name, cost, trainer_membership_id, gym_name, gym_location from gymclass where class_id=$cid";
