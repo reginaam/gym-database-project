@@ -6,6 +6,13 @@ if (!$mid) {
 	header("Location: index.php");
 }
 
+$sql = "select membership_id from athlete where membership_id=$mid";
+$result = OCI_Parse($db_conn, $sql);
+oci_execute($result);
+if (!oci_fetch_array($result)) {
+	header("Location: index.php");
+}
+
 // -----------------------
 // Personal section
 $result = executePlainSQL("select name, email, phone_number from gymuser where membership_id = $mid");
@@ -58,65 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			}
 		}
 	}
-	else if (array_key_exists('newuser', $_POST)) {
-		$anyerrors = false;
-		$u_name = htmlspecialchars($_POST['name'], ENT_QUOTES);
-		if (strlen($u_name)> 40) {
-			$nameerror = "Name too long";
-			$anyerrors = true;
-		}
-		$u_email = htmlspecialchars($_POST['email']);
-		if (!filter_var($u_email, FILTER_VALIDATE_EMAIL)) {
-			$emailerror = "Enter a valid email";
-			$anyerrors = true;
-		}
-		$u_phone = htmlspecialchars($_POST['phone']);
-		if (!preg_match("/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/", $u_phone)) {
-			$phoneerror = "Phone number must be in the format xxx-xxx-xxxx";
-			$anyerrors = true;
-		}
-		$sql = "select membership_id from gymuser order by membership_id desc";
-		$state = OCI_Parse($db_conn, $sql);
-		$r = oci_execute($state);
-		if (!$r) {
-			$anyerrors = true;
-		}
-		if (!$anyerrors) {
-			$row = oci_fetch_array($state);
-			$newid = $row[0] + 1;
-			
-			$sql = "insert into gymuser values(".$newid.", '".$u_email."', '".$u_name."', '".$u_phone."')";
-			$state = OCI_Parse($db_conn, $sql);
-			$r = oci_execute($state);
-			if (!$r) {
-				$usererror = "Failed to create new user";
-			} else {
-				$usertype = $_POST['utype'];
-				if ($usertype == "athlete") {
-					$sql = "insert into athlete values($newid)";
-					$state = OCI_Parse($db_conn, $sql);
-					$r = oci_execute($state);
-					if (!$r) {
-						$usererror = "Failed to create new user";
-					}
-				} else if ($usertype == "trainer") {
-					$sql = "insert into trainer values($newid)";
-					$state = OCI_Parse($db_conn, $sql);
-					$r = oci_execute($state);
-					if (!$r) {
-						$usererror = "Failed to create new user";
-					}
-				} else if ($usertype == "admin") {
-					$sql = "insert into gymadmin values($newid)";
-					$state = OCI_Parse($db_conn, $sql);
-					$r = oci_execute($state);
-					if (!$r) {
-						$usererror = "Failed to create new user";
-					}
-				}
-			}
-		}
-	}
+
 }
 
 
@@ -206,6 +155,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	.classlist:nth-child(even) {
 		background-color: #ffe9e9;
 	}
+	
+	.half {
+		display: inline-block;
+		width: 49.5%;
+	}
 	</style>
 </head>
 <body>
@@ -216,7 +170,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	<div id="nav">
 		<div class="tab selected" id="personal"><p>Personal Info</p></div>
 		<div class="tab" id="gyms"><p>View Classes</p></div>
-		<div class="tab" id="users"><p>Manage Routines</p></div>
+		<div class="tab" id="routines"><p>Manage Routines</p></div>
 	</div>
 	<div class="view home" id="personal">
 		<div class="innerview">
@@ -333,18 +287,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		</div>
 	</div>
 	
-	<div class="view" id="users">
+	<div class="view" id="routines">
 		<div class="innerview">
-			<h3> Users </h3>
-			<p> Create a new user </p>
-			<form method=post>
-				<span style="color:red;"><?php echo $usererror ?></span><br>
-				<label>Name </label><input name="name" type=text value=<?php echo $u_name ?>><span><?php echo $nameerror ?></span><br><br>
-				<label>Email</label><input name="email" type=text value=<?php echo $u_email ?>><span><?php echo $emailerror ?></span><br><br>
-				<label>Phone number</label><input name="phone" type=text value=<?php echo $u_phone ?>><span><?php echo $phoneerror ?></span><br><br>
-				<label>User type </label><input type="radio" name="utype" value="athlete" checked>Athlete<br><input type="radio" name="utype" value="trainer">Trainer<br><input type="radio" name="utype" value="admin">Admin<br><br>
-				<button type=submit name="newuser">Create user</button>
-			</form>
+			<div class="half">
+				<h3 style='display:inline-block;'> Your Routines </h3>
+				<form method=get action='newroutine.php' style='display:inline-block;'>
+					<input type=hidden name='mid' value=<?php echo $mid ?>>
+					<button type='submit' class='newgymbutton'>+</button>
+				</form>
+				<ul>
+				<?php 
+					$sql = "select routine_name, intensity from routine where membership_id=$mid";
+					$parse = OCI_Parse($db_conn, $sql);
+					$r = oci_execute($parse);
+					if (!$r) {
+						echo "<span style='color:red;'> Could not retrieve routine info </span>";
+					} else {
+						while ($row = oci_fetch_array($parse, OCI_BOTH)) {
+							$rname = $row[0];
+							$rintensity = $row[1];
+							echo "<li class='gymlist'><p style='display:inline-block;'>$rname, Intensity: $rintensity/10</p><form method=get action='editroutine.php' style='display:inline-block;'><input type=hidden name='routinename' value='$rname'><input type=hidden name='intensity' value='$rintensity'><input type=hidden name='mid' value=$mid><button type='submit' class='editgymbutton' ><i class='material-icons'>create</i></button></form><hr><ul><li><p style='color:101010; display: inline-block;'>Exercises</p><form method=get action='newexercise.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><input type=hidden name='routinename' value='$rname'><input type=hidden name='intensity' value='$rintensity'><button type='submit' class='newgymbutton'>+</button></form></li>";
+							$sql = "select exercise_name, body_part from exercise where routine_name='$rname' and intensity = $rintensity";
+							$parseex = OCI_Parse($db_conn, $sql);
+							oci_execute($parseex);
+					
+							while ($exrow = oci_fetch_array($parseex, OCI_BOTH)) {
+								$exname = $exrow[0];
+								$expart = $exrow[1];
+								echo "<li class='classlist'><p style='display:inline-block;'>$exname (works: $expart)</p><form method=get action='editexercise.php' style='display:inline-block;'><input type=hidden name='exercisename' value='$exname'><input type=hidden name='bodypart' value='$expart'><input type=hidden name='mid' value=$mid><button type='submit' class='editgymbutton'><i class='material-icons'>create</i></button></form><br></li>";
+							}
+					
+							echo "</ul></li>";
+						}
+					}
+				?>
+				</ul>
+			</div>
+			<div class="half">
+				<h3> Routines you follow </h3>
+			</div>
 		</div>
 	</div>
 </body>

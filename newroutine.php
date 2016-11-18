@@ -6,11 +6,12 @@
 		header("Location: index.php");
 	}
 	
+	$istrainer = true;
 	$sql = "select membership_id from trainer where membership_id=$mid";
 	$result = OCI_Parse($db_conn, $sql);
 	oci_execute($result);
 	if (!oci_fetch_array($result)) {
-		header("Location: index.php");
+		$istrainer = false;
 	}
 	
 	$errors = "";
@@ -36,16 +37,24 @@
         
         $reps = $_POST['reps'];
         
-        $class = $_POST['class'];
+        if ($istrainer) {
+	        $class = $_POST['class'];
+        }
 		
 		if (!$anyerrors) {
-			$sql = "insert into routine values('$name', '$intensity', '$sets', '$reps', '$mid', '$class')";
+			if ($istrainer) {
+				$sql = "insert into routine values('$name', '$intensity', '$sets', '$reps', '$mid', '$class')";
+			} else {
+				$sql = "insert into routine values('$name', '$intensity', '$sets', '$reps', '$mid', NULL)";	
+			}
 			$result = OCI_Parse($db_conn, $sql);
 			$r = oci_execute($result);
 			if (!$r) {
 				$errors = "Failed to create Routine";
-			} else {
+			} else if ($istrainer) {
 				header("Location: trainer.php?mid=$mid");
+			} else {
+				header("Location: athlete.php?mid=$mid");
 			}
 		}
 	}
@@ -65,7 +74,11 @@
     <label> Intensity: </label><input type=int name="intensity" value="<?php echo $intensity ?>"><br><br>
     <label> Sets: </label><input type=int name="sets" value="<?php echo $sets ?>"><br><br>
     <label> Reps: </label><input type=int name="reps" value="<?php echo $reps ?>"><br><br>
-    <label> Class ID: </label><input type=int name="class" value="<?php echo $class ?>"><br><br>
+    <?php 
+    	if ($istrainer) {
+    		echo '<label> Class ID: </label><input type=int name="class" value="<?php echo $class ?>"><br><br>';
+	    }
+    ?>
 	<button type=submit> Create </button>
 </form>
 </body>

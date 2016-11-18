@@ -6,6 +6,13 @@
         header("Location: index.php");
     }
     
+    $sql = "select membership_id from trainer where membership_id=$mid";
+	$result = OCI_Parse($db_conn, $sql);
+	oci_execute($result);
+	if (!oci_fetch_array($result)) {
+		header("Location: index.php");
+	}
+    
     // -----------------------
     // Personal section
     $result = executePlainSQL("select name, email, phone_number from gymuser where membership_id = $mid");

@@ -8,11 +8,12 @@
 		header("Location: index.php");
 	}
 	
+	$istrainer = true;
 	$sql = "select membership_id from trainer where membership_id=$mid";
 	$result = OCI_Parse($db_conn, $sql);
 	oci_execute($result);
 	if (!oci_fetch_array($result)) {
-		header("Location: index.php");
+		$istrainer = false;
 	}
 	
 	$errors = "";
@@ -47,8 +48,10 @@
 			$r = oci_execute($result);
 			if (!$r) {
 				$errors = "Failed to create Exercise";
-			} else {
+			} else if ($istrainer) {
 				header("Location: trainer.php?mid=$mid");
+			} else {
+				header("Location: athlete.php?mid=$mid");
 			}
 		}
 	}
