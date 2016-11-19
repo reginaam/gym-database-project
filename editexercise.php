@@ -9,7 +9,15 @@ if (!$mid || !$name || !$body) {
 	header("Location: index.php");
 }
 
-$sql = "select exercise_name, body_part, benefit from exercise where exercise_name=$name and body_part = $body";
+$istrainer = true;
+$sql = "select membership_id from trainer where membership_id=$mid";
+$result = OCI_Parse($db_conn, $sql);
+oci_execute($result);
+if (!oci_fetch_array($result)) {
+	$istrainer = false;
+}
+
+$sql = "select exercise_name, body_part, benefit from exercise where exercise_name='$name' and body_part ='$body'";
 $result = OCI_Parse($db_conn, $sql);
 oci_execute($result);
 $row = oci_fetch_array($result);
@@ -46,13 +54,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else $benefit = $newbenefit;
 
 	if (!$anyerrors) {
-		$sql = "update exercise set exercise_name='$newname', body_part=$newbody, benefit=$newbenefit where exercise_name=$name and body_part = $body";
+		$sql = "update exercise set exercise_name='$newname', body_part='$newbody', benefit='$newbenefit' where exercise_name='$name' and body_part = '$body'";
 		$result = OCI_Parse($db_conn, $sql);
 		$r = oci_execute($result);
 		if (!$r) {
 			$errors = "Error updating info";
-		} else {
+		} else if ($istrainer) {
 			header("Location: trainer.php?mid=$mid");
+		} else {
+			header("Location: athlete.php?mid=$mid");
 		}
 	}
 }
