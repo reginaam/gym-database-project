@@ -158,7 +158,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	
 	.half {
 		display: inline-block;
-		width: 49.5%;
+		width: 39%;
+		vertical-align: top;
+		padding: 0 5%;
 	}
 	</style>
 </head>
@@ -288,16 +290,49 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	</div>
 	
 	<div class="view" id="routines">
-		<div class="innerview">
-			<div class="half">
-				<h3 style='display:inline-block;'> Your Routines </h3>
-				<form method=get action='newroutine.php' style='display:inline-block;'>
-					<input type=hidden name='mid' value=<?php echo $mid ?>>
-					<button type='submit' class='newgymbutton'>+</button>
-				</form>
-				<ul>
+		<div class="half">
+			<h3 style='display:inline-block;'> Your Routines </h3>
+			<form method=get action='newroutine.php' style='display:inline-block;'>
+				<input type=hidden name='mid' value=<?php echo $mid ?>>
+				<button type='submit' class='newgymbutton'>+</button>
+			</form>
+			<ul style="padding-left: 0;">
+			<?php 
+				$sql = "select routine_name, intensity from routine where membership_id=$mid";
+				$parse = OCI_Parse($db_conn, $sql);
+				$r = oci_execute($parse);
+				if (!$r) {
+					echo "<span style='color:red;'> Could not retrieve routine info </span>";
+				} else {
+					while ($row = oci_fetch_array($parse, OCI_BOTH)) {
+						$rname = $row[0];
+						$rintensity = $row[1];
+						echo "<li class='gymlist'><p style='display:inline-block;'>$rname, Intensity: $rintensity/10</p><form method=get action='editroutine.php' style='display:inline-block;'><input type=hidden name='routinename' value='$rname'><input type=hidden name='intensity' value='$rintensity'><input type=hidden name='mid' value=$mid><button type='submit' class='editgymbutton' ><i class='material-icons'>create</i></button></form><hr><ul><li><p style='color:101010; display: inline-block;'>Exercises</p><form method=get action='newexercise.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><input type=hidden name='routinename' value='$rname'><input type=hidden name='intensity' value='$rintensity'><button type='submit' class='newgymbutton'>+</button></form></li>";
+						$sql = "select exercise_name, body_part from exercise where routine_name='$rname' and intensity = $rintensity";
+						$parseex = OCI_Parse($db_conn, $sql);
+						oci_execute($parseex);
+				
+						while ($exrow = oci_fetch_array($parseex, OCI_BOTH)) {
+							$exname = $exrow[0];
+							$expart = $exrow[1];
+							echo "<li class='classlist'><p style='display:inline-block;'>$exname (works: $expart)</p><form method=get action='editexercise.php' style='display:inline-block;'><input type=hidden name='exercisename' value='$exname'><input type=hidden name='bodypart' value='$expart'><input type=hidden name='mid' value=$mid><button type='submit' class='editgymbutton'><i class='material-icons'>create</i></button></form><br></li>";
+						}
+				
+						echo "</ul></li>";
+					}
+				}
+			?>
+			</ul>
+		</div>
+		<div class="half">
+			<h3 style='display:inline-block;'> Routines you follow </h3>
+			<form method=get action='queryroutine.php' style='display:inline-block;'>
+				<input type=hidden name='mid' value=<?php echo $mid ?>>
+				<button type='submit' class='editgymbutton'><i class='material-icons'>find_in_page</i></button>
+			</form>
+			<ul style="padding-left: 0;">
 				<?php 
-					$sql = "select routine_name, intensity from routine where membership_id=$mid";
+					$sql = "select routine_name, intensity from workon where membership_id=$mid";
 					$parse = OCI_Parse($db_conn, $sql);
 					$r = oci_execute($parse);
 					if (!$r) {
@@ -306,26 +341,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 						while ($row = oci_fetch_array($parse, OCI_BOTH)) {
 							$rname = $row[0];
 							$rintensity = $row[1];
-							echo "<li class='gymlist'><p style='display:inline-block;'>$rname, Intensity: $rintensity/10</p><form method=get action='editroutine.php' style='display:inline-block;'><input type=hidden name='routinename' value='$rname'><input type=hidden name='intensity' value='$rintensity'><input type=hidden name='mid' value=$mid><button type='submit' class='editgymbutton' ><i class='material-icons'>create</i></button></form><hr><ul><li><p style='color:101010; display: inline-block;'>Exercises</p><form method=get action='newexercise.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><input type=hidden name='routinename' value='$rname'><input type=hidden name='intensity' value='$rintensity'><button type='submit' class='newgymbutton'>+</button></form></li>";
+							echo "<li class='gymlist'><p style='display:inline-block;'>$rname, Intensity: $rintensity/10</p><hr><ul><li><p style='color:101010; display: inline-block;'>Exercises</p></li>";
 							$sql = "select exercise_name, body_part from exercise where routine_name='$rname' and intensity = $rintensity";
 							$parseex = OCI_Parse($db_conn, $sql);
 							oci_execute($parseex);
-					
+				
 							while ($exrow = oci_fetch_array($parseex, OCI_BOTH)) {
 								$exname = $exrow[0];
 								$expart = $exrow[1];
-								echo "<li class='classlist'><p style='display:inline-block;'>$exname (works: $expart)</p><form method=get action='editexercise.php' style='display:inline-block;'><input type=hidden name='exercisename' value='$exname'><input type=hidden name='bodypart' value='$expart'><input type=hidden name='mid' value=$mid><button type='submit' class='editgymbutton'><i class='material-icons'>create</i></button></form><br></li>";
+								echo "<li class='classlist'><p style='display:inline-block;'>$exname (works: $expart)</p><br></li>";
 							}
-					
+				
 							echo "</ul></li>";
 						}
 					}
 				?>
-				</ul>
-			</div>
-			<div class="half">
-				<h3> Routines you follow </h3>
-			</div>
+			</ul>
 		</div>
 	</div>
 </body>
