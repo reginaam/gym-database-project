@@ -126,7 +126,7 @@
 	<h3> Select a routine to work on. </h3>
 	<ul style="width:50%; margin: 0 auto;">
 		<?php 
-			$sql = "select distinct r.routine_name, r.intensity from routine r, workon w, exercise e where w.membership_id<>$mid and r.membership_id <> $mid and r.routine_name = w.routine_name and r.intensity = w.intensity and r.routine_name = e.routine_name and r.intensity = e.intensity";
+			$sql = "select distinct r.routine_name, r.intensity from routine r left join exercise e on r.routine_name = e.routine_name and r.intensity = e.intensity where r.membership_id <> $mid";
 			
 			if ($rname) $sql .= " and upper(r.routine_name) like upper('%$rname%')";
 			if ($imin) $sql .= " and r.intensity >= $imin";
@@ -137,6 +137,7 @@
 			if ($rmax) $sql .= " and r.reps <= $rmax";
 			if ($ename) $sql .= " and upper(e.exercise_name) like upper('%$ename%')";
 			if ($bpart) $sql .= " and upper(e.body_part) like upper('%$bpart%')";
+			$sql .= " minus (select w.routine_name, w.intensity from workon w where w.membership_id = $mid)";
 			$parse = OCI_Parse($db_conn, $sql);
 			$r = oci_execute($parse);
 			if (!$r) {

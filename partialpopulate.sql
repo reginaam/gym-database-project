@@ -63,7 +63,6 @@ INSERT INTO Attends values(3, 3);
 INSERT INTO Attends values(4, 4);
 INSERT INTO Attends values(5, 5);
 
-
 INSERT INTO ClassSchedule values('2016-11-13', '1330', '1430');
 INSERT INTO ClassSchedule values('2016-10-25', '1430', '1530');
 INSERT INTO ClassSchedule values('2016-11-13', '1500', '1600');

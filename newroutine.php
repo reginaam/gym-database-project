@@ -76,7 +76,7 @@
     <label> Reps: </label><input type=int name="reps" value="<?php echo $reps ?>"><br><br>
     <?php 
     	if ($istrainer) {
-    		echo '<label> Class ID: </label><input type=int name="class" value="<?php echo $class ?>"><br><br>';
+    		echo '<label> Class ID: </label><input type=int name="class" value="'.$class.'"><br><br>';
 	    }
     ?>
 	<button type=submit> Create </button>

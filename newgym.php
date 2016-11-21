@@ -46,7 +46,7 @@
 			if (!$r) {
 				$errors = "A gym with that name and location already exists.";
 			} else {
-				header("Location: admin.php?mid=$mid");
+				header("Location: admin.php?mid=$mid&tab=1");
 			}
 		}
 	}

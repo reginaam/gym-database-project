@@ -54,7 +54,7 @@
 			if (!$r) {
 				$errors = "Failed to create class";
 			} else {
-				header("Location: admin.php?mid=$mid");
+				header("Location: admin.php?mid=$mid&tab=1");
 			}
 		}
 	}

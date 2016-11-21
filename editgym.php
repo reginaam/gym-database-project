@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		if (!$r) {
 			$errors = "Error in update.";
 		} else {
-			header("Location: admin.php?mid=$mid");
+			header("Location: admin.php?mid=$mid&tab=1");
 		}
 	}
 }
