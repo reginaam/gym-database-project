@@ -8,7 +8,7 @@
 		header("Location: index.php");
 	}
 	
-	$sql = "select membership_id from gymadmin, trainer where membership_id=$mid";
+	$sql = "select membership_id from gymadmin where membership_id=$mid and (g.membership_id = a.membership_id or g.membership_id = t.membership_id)";
 	$result = OCI_Parse($db_conn, $sql);
 	oci_execute($result);
 	if (!oci_fetch_array($result)) {
