@@ -65,6 +65,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			}
 		}
 	}
+	else if (array_key_exists('addClass', $_POST)) {
+		$classID = $_POST['cid'];
+		$sql = "insert into Attends values('$classID', $mid)";
+		$result = OCI_Parse($db_conn, $sql);
+		$r = oci_execute($result);
+		header("Location: athlete.php?mid=$mid");
+	}
+	
+	else if (array_key_exists('removeClass', $_POST)) {
+		$classID = $_POST['cid'];
+		$sql = "delete Attends where class_id = $classID and membership_id = $mid";
+		$result = OCI_Parse($db_conn, $sql);
+		$r = oci_execute($result);
+		header("Location: athlete.php?mid=$mid");
+	}
 
 }
 
@@ -186,11 +201,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			</form>
 		</div>
 	</div>
-	<!-- *******Need to change some of the variable names and stuff like div ids and then reflect them in the css files, also need to add a remove button
-	-->
 	
 	<div class="view" id="gyms">
-		<div class="innerview">
+		<div class="half">
 			<?php
 				$sql = "select gc.name, gu.name, gc.class_id, gu.membership_id, gc.trainer_membership_id, a.class_id, a.membership_id from GymClass gc, GymUser gu, Attends a where gu.membership_id=gc.trainer_membership_id and gc.class_id=a.class_id and a.membership_id=$mid";
 				$parse = OCI_Parse($db_conn, $sql);
@@ -205,7 +218,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 					$trainerName = $row[1];
 					$classID = $row[2];
 
-					echo "<li class='gymlist'><p style='display:inline-block;'>$className with $trainerName</p><hr><ul><li><p style='color:101010; display: inline-block;'>Info</p></li>";
+					echo "<li class='gymlist'><p style='display:inline-block;'>$className with $trainerName</p><form method=post style='display:inline-block;'><input type=hidden name='cid' value='$classID'><button class='editgymbutton' name='removeClass'><i class='material-icons'>-</i></button></form><hr><ul><li><p style='color:101010; display: inline-block;'>Info</p></li>";
 
 					//select individual class info
 					$sql = "select gc.gym_name, gc.gym_location, fs.class_date, fs.start_time, fs.end_time, r.routine_name, gc.cost, r.class_id, gc.class_id, fs.class_id from FollowSchedule fs, GymClass gc, Routine r where fs.class_id=gc.class_id and r.class_id=fs.class_id and fs.class_id=$classID";
@@ -237,10 +250,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			}
 			?>
 		</div>
-	</div>
-	
-	<div class="view" id="gyms">
-		<div class="innerview">
+		
+		<div class="half">
 		<?php 
 			$sql = "select gc.name, gu.name, gc.class_id, gu.membership_id, gc.trainer_membership_id, a.class_id, a.membership_id from GymClass gc, GymUser gu, Attends a where gu.membership_id=gc.trainer_membership_id and gc.class_id=a.class_id and a.membership_id!=$mid";
 			$parse = OCI_Parse($db_conn, $sql);
@@ -249,13 +260,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 					echo "<span style='color:red';> Could not get class info";
 				}
 				else {
-				echo "<h3 style='display: inline-block';> Other Classes </h3>";
+				echo "<h3 style='display: inline-block';> Other Classes </h3>
+				<form method=get action='queryClasses.php' style='display:inline-block;'>
+				<input type=hidden name='mid' value=" . $mid . ">
+				<button type='submit' class='editgymbutton'><i class='material-icons'>find_in_page</i></button>
+			</form>";
 				while ($row = oci_fetch_array($parse, OCI_BOTH)) {
 					$className  = $row[0];
 					$trainerName = $row[1];
 					$classID = $row[2];
 
-					echo "<li class='gymlist'><p style='display:inline-block;'>$className with $trainerName</p><hr><ul><li><p style='color:101010; display: inline-block;'>Info</p></li>";
+					echo "<li class='gymlist'><p style='display:inline-block;'>$className with $trainerName</p><form method=post style='display:inline-block;'><input type=hidden name='cid' value='$classID'><button class='editgymbutton' name='addClass'><i class='material-icons'>+</i></button></form><hr><ul><li><p style='color:101010; display: inline-block;'>Info</p></li>";
 
 					//select individual class info
 					$sql = "select gc.gym_name, gc.gym_location, fs.class_date, fs.start_time, fs.end_time, r.routine_name, gc.cost, r.class_id, gc.class_id, fs.class_id from FollowSchedule fs, GymClass gc, Routine r where fs.class_id=gc.class_id and r.class_id=fs.class_id and fs.class_id=$classID";
@@ -307,7 +322,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 					while ($row = oci_fetch_array($parse, OCI_BOTH)) {
 						$rname = $row[0];
 						$rintensity = $row[1];
-						echo "<li class='gymlist'><p style='display:inline-block;'>$rname, Intensity: $rintensity/10</p><form method=get action='editroutine.php' style='display:inline-block;'><input type=hidden name='routinename' value='$rname'><input type=hidden name='intensity' value='$rintensity'><input type=hidden name='mid' value=$mid><button type='submit' class='editgymbutton' ><i class='material-icons'>create</i></button></form><hr><ul><li><p style='color:101010; display: inline-block;'>Exercises</p><form method=get action='newexercise.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><input type=hidden name='routinename' value='$rname'><input type=hidden name='intensity' value='$rintensity'><button type='submit' class='newgymbutton'>+</button></form></li>";
+						echo "<li class='gymlist'><p style='display:inline-block;'>$rname, Intensity: $rintensity/10</p><form method=get action='editroutine.php' style='display:inline-block;'><input type=hidden name='routinename' value='$rname'><input type=hidden name='intensity' value='$rintensity'><input type=hidden name='mid' value=$mid><button type='submit' class='editgymbutton'><i class='material-icons'>create</i></button></form><hr><ul><li><p style='color:101010; display: inline-block;'>Exercises</p><form method=get action='newexercise.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><input type=hidden name='routinename' value='$rname'><input type=hidden name='intensity' value='$rintensity'><button type='submit' class='newgymbutton'>+</button></form></li>";
 						$sql = "select exercise_name, body_part from exercise where routine_name='$rname' and intensity = $rintensity";
 						$parseex = OCI_Parse($db_conn, $sql);
 						oci_execute($parseex);
