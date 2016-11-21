@@ -6,7 +6,7 @@ if (!$mid) {
 	header("Location: index.php");
 }
 
-$sql = "select membership_id from admin where membership_id=$mid";
+$sql = "select membership_id from gymadmin where membership_id=$mid";
 $result = OCI_Parse($db_conn, $sql);
 oci_execute($result);
 if (!oci_fetch_array($result)) {
