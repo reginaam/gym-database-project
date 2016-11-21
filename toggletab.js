@@ -1,6 +1,7 @@
 $(document).ready(function() {
 	$('.view').hide();
-	$('.view.home').show();
+	var id = $('.tab.selected').attr('id');
+	$('.view#'+id).show();
 	
 	$('.tab').click(function(){
 		var id = $(this).attr('id');

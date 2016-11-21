@@ -1,4 +1,6 @@
 <?php
+// NOTE: Most of the content in this file was taken from the 304 course page
+
 
 $success = True; //keep track of errors so it redirects the page only if there are no errors
 include 'userinfo.php';
