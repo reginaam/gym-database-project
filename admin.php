@@ -401,6 +401,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				?>
 				<button type="submit" name="bodypartmetric">Go</button>
 			</form>
+			<hr>
+			<p> Star athletes (athletes currently working on a routine of every available intensity):</p>
+			<ul>
+			<?php 
+				$sql = "select name from gymuser where membership_id = ( select membership_id from athlete minus (select distinct membership_id from ((select distinct a.membership_id, r.intensity from athlete a, routine r) minus ((select distinct a.membership_id, r.intensity from athlete a, routine r where a.membership_id = r.membership_id) union (select distinct a.membership_id, w.intensity from athlete a, workon w where a.membership_id = w.membership_id)))))";
+				$result = OCI_Parse($db_conn, $sql);
+				oci_execute($result);
+				while ($row = oci_fetch_array($result)) {
+					$starname = $row[0];
+					echo "<li> $starname </li>";
+				}
+			?>
+			</ul>
 		</div>
 	</div>
 </body>
