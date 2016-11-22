@@ -172,6 +172,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		oci_execute($bpartresult);
 	}
 	else if (array_key_exists('deleteClass', $_POST)) { 
+		$tab = 1;
 		$classid = $_POST['classid'];
 		$mid = $_POST['mid'];
 		$sql = "delete GymClass where class_id = $classid";

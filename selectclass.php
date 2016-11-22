@@ -28,7 +28,7 @@
 		$sql = "insert into Attends values('$classID', $mid)";
 		$result = OCI_Parse($db_conn, $sql);
 		$r = oci_execute($result);
-		header("Location: athlete.php?mid=$mid");
+		header("Location: athlete.php?mid=$mid&tab=1");
 	}
 	
 ?>
