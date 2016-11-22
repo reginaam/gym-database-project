@@ -6,12 +6,20 @@
 		header("Location: index.php");
 	}
 	
-	$sql = "select membership_id from athlete where membership_id=$mid";
+	$sql = "select membership_id from gymuser where membership_id=$mid";
 	$result = OCI_Parse($db_conn, $sql);
 	oci_execute($result);
 	if (!oci_fetch_array($result)) {
 		header("Location: index.php");
 	}
+    
+    $trainers = executePlainSQL("select membership_id from trainer where membership_id = $mid");
+    $row = oci_fetch_array($result);
+    $istrainer = true;
+    if (!$row[0]) {
+        $istrainer = false;
+    }
+
 	
 	$rname = $_GET['rname'];
 	$imax = $_GET['imax'];
@@ -150,7 +158,9 @@
 				while ($row) {
 					$rname = $row[0];
 					$rintensity = $row[1];
-					echo "<li class='gymlist'><p style='display:inline-block;'>$rname, Intensity: $rintensity/10</p><form method=post style='display:inline-block;'><input type=hidden name='mid' value=$mid><input type=hidden name='rname' value='$rname'><input type=hidden name='intensity' value='$rintensity'><button class='editgymbutton'><i class='material-icons'>playlist_add</i></button></form><hr><ul><li><p style='color:101010; display: inline-block;'>Exercises</p></li>";
+					echo "<li class='gymlist'><p style='display:inline-block;'>$rname, Intensity: $rintensity/10</p>";
+                    if (!$istrainer) {echo "<form method=post style='display:inline-block;'><input type=hidden name='mid' value=$mid><input type=hidden name='rname' value='$rname'><input type=hidden name='intensity' value='$rintensity'><button class='editgymbutton'><i class='material-icons'>playlist_add</i></button></form>";}
+                    echo "<hr><ul><li><p style='color:101010; display: inline-block;'>Exercises</p></li>";
 					$sql = "select exercise_name, body_part from exercise where routine_name='$rname' and intensity = $rintensity";
 					$parseex = OCI_Parse($db_conn, $sql);
 					oci_execute($parseex);
