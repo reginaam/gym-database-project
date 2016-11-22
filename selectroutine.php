@@ -5,21 +5,13 @@
 	if (!$mid) {
 		header("Location: index.php");
 	}
-	
-	$sql = "select membership_id from gymuser where membership_id=$mid";
-	$result = OCI_Parse($db_conn, $sql);
-	oci_execute($result);
-	if (!oci_fetch_array($result)) {
-		header("Location: index.php");
-	}
     
     $trainers = executePlainSQL("select membership_id from trainer where membership_id = $mid");
-    $row = oci_fetch_array($result);
+    $row = oci_fetch_array($trainers);
     $istrainer = true;
     if (!$row[0]) {
         $istrainer = false;
     }
-
 	
 	$rname = $_GET['rname'];
 	$imax = $_GET['imax'];
@@ -131,7 +123,10 @@
 	</style>
 </head>
 <body>
-	<h3> Select a routine to work on. </h3>
+	<?php 
+		if ($istrainer) echo "<h3> All routines </h3>";
+		else echo "<h3> Select routine to work on. </h3>";
+	?>
 	<ul style="width:50%; margin: 0 auto;">
 		<?php 
 			$sql = "select distinct r.routine_name, r.intensity from routine r left join exercise e on r.routine_name = e.routine_name and r.intensity = e.intensity where r.membership_id <> $mid";

@@ -6,12 +6,12 @@
 		header("Location: index.php");
 	}
 	
-	$sql = "select membership_id from athlete where membership_id=$mid";
-	$result = OCI_Parse($db_conn, $sql);
-	oci_execute($result);
-	if (!oci_fetch_array($result)) {
-		header("Location: index.php");
-	}
+	$trainers = executePlainSQL("select membership_id from trainer where membership_id = $mid");
+    $row = oci_fetch_array($trainers);
+    $istrainer = true;
+    if (!$row[0]) {
+        $istrainer = false;
+    }
 	
 	$cname = $_GET['cname'];
 	$insname = $_GET['instructorName'];
@@ -123,7 +123,10 @@
 	</style>
 </head>
 <body>
-	<h3> Select a class to attend. </h3>
+	<?php 
+		if ($istrainer) echo "<h3> All classes </h3>";
+		else echo "<h3> Select a class to attend. </h3>";
+	?>
 	<ul style="width:50%; margin: 0 auto;">
 		<?php 
 			$sql = "select distinct gc.name, gu.name, gc.class_id, gc.gym_name, gc.gym_location, r.routine_name, gc.cost, gu.membership_id, gc.trainer_membership_id, r.class_id from GymClass gc left join Routine r on r.class_id = gc.class_id join GymUser gu on gu.membership_id=gc.trainer_membership_id";
@@ -149,7 +152,9 @@
 					$insName = $row[1];
 					$classID = $row[2];
 					
-					echo "<li class='gymlist'><p style='display:inline-block;'>$cName with $insName</p><form method=post style='display:inline-block;'><input type=hidden name='mid' value=$mid><input type=hidden name='cid' value='$classID'><button class='editgymbutton'><i class='material-icons'>playlist_add</i></button></form><hr><ul><li><p style='color:101010; display: inline-block;'>Info:</p></li>";
+					echo "<li class='gymlist'><p style='display:inline-block;'>$cName with $insName</p>";
+					if (!$istrainer) echo "<form method=post style='display:inline-block;'><input type=hidden name='mid' value=$mid><input type=hidden name='cid' value='$classID'><button class='editgymbutton'><i class='material-icons'>playlist_add</i></button></form>";
+					echo "<hr><ul><li><p style='color:101010; display: inline-block;'>Info:</p></li>";
 
 					$sql = "select distinct gc.gym_name, gc.gym_location, r.routine_name, gc.cost, gc.class_date, gc.start_time, gc.end_time from GymClass gc left join Routine r on r.class_id=gc.class_id where gc.class_id=$classID";
 					$parseex = OCI_Parse($db_conn, $sql);

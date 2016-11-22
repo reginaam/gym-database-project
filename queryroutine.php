@@ -6,13 +6,6 @@
 		header("Location: index.php");
 	}
 	
-	$sql = "select membership_id from gymuser where membership_id=$mid";
-	$result = OCI_Parse($db_conn, $sql);
-	oci_execute($result);
-	if (!oci_fetch_array($result)) {
-		header("Location: index.php");
-	}
-	
 	$rnameerror = "";
 	$iminerror = "";
 	$imaxerror = "";
