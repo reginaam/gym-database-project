@@ -124,7 +124,7 @@
 </head>
 <body>
 	<?php 
-		if ($istrainer) echo "<h3> All routines </h3>";
+		if ($istrainer) echo "<h3> All classes </h3>";
 		else echo "<h3> Select a class to attend. </h3>";
 	?>
 	<ul style="width:50%; margin: 0 auto;">
