@@ -1,0 +1,290 @@
+admin.php queries
+$sql = "select membership_id from gymadmin where membership_id=$mid";
+$result = executePlainSQL("select name, email, phone_number from gymuser where membership_id = $mid");
+$sql = "update gymuser set name='" . $newname . "', email='" . $newemail. "', phone_number='"  . $newphone . "' where membership_id=".$mid;
+$sql = "select membership_id from gymuser order by membership_id desc";
+$sql = "insert into gymuser values(".$newid.", '".$u_email."', '".$u_name."', '".$u_phone."')";
+$sql = "insert into athlete values($newid)";
+$sql = "insert into trainer values($newid)";
+$sql = "insert into gymadmin values($newid)";
+$sql = "select $typestr from routine";
+$sql = "select $typestr from routine, athlete where athlete.membership_id = routine.membership_id";
+$sql = "select $typestr from routine, trainer where trainer.membership_id = routine.membership_id";
+$sql = "select e.body_part, $typestr from routine r, exercise e where r.intensity = e.intensity and r.routine_name = e.routine_name group by e.body_part order by e.body_part";
+$sql = "select gym_name, gym_location from gym where membership_id = $mid";
+$sql = "select distinct gc.class_id, gc.name, gc.cost, t.name from gymclass gc, gymuser t where gc.gym_name = '$gymname' and gc.gym_location = '$gymloc' and gc.trainer_membership_id = t.membership_id order by gc.name";
+$sql = "select Count(*) from athlete";
+$sql = "select Count(*) from trainer";$sql = "select distinct gc.name, gu.name, gc.class_id, gc.gym_name, gc.gym_location, r.routine_name, gc.cost, gc.class_date, gc.start_time, gc.end_time from GymClass gc join notattends na on na.class_id = gc.class_id join GymUser gu on gu.membership_id=gc.trainer_membership_id left join Routine r on gc.class_id=r.class_id";
+$sql = "select Count(*) from gymadmin";
+$sql = "select name from gymuser where membership_id = ( select membership_id from athlete minus (select distinct membership_id from ((select distinct a.membership_id, r.intensity from athlete a, routine r) minus ((select distinct a.membership_id, r.intensity from athlete a, routine r where a.membership_id = r.membership_id) union (select distinct a.membership_id, w.intensity from athlete a, workon w where a.membership_id = w.membership_id)))))";
+
+athlete.php queries
+$sql = "select membership_id from athlete where membership_id=$mid";
+$result = executePlainSQL("select name, email, phone_number from gymuser where membership_id = $mid");
+$sql = "update gymuser set name='" . $newname . "', email='" . $newemail. "', phone_number='"  . $newphone . "' where membership_id=".$mid;
+$sql = "insert into Attends values('$classID', $mid)";
+$sql = "delete Attends where class_id = $classID and membership_id = $mid";
+$sql = "select gc.name, gu.name, gc.class_id, gu.membership_id, gc.trainer_membership_id, a.class_id, a.membership_id from GymClass gc, GymUser gu, Attends a where gu.membership_id=gc.trainer_membership_id and gc.class_id=a.class_id and a.membership_id=$mid";
+$sql = "select gc.gym_name, gc.gym_location, r.routine_name, gc.cost from GymClass gc left join Routine r on r.class_id=gc.class_id where gc.class_id=$classID";
+$nosql = "create view notattends as (select class_id from gymclass) minus (select class_id from attends where attends.membership_id = $mid)";
+$sql = "select distinct gc.name, gu.name, gc.class_id, gc.gym_name, gc.gym_location, r.routine_name, gc.cost, gc.class_date, gc.start_time, gc.end_time from GymClass gc join notattends na on na.class_id = gc.class_id join GymUser gu on gu.membership_id=gc.trainer_membership_id left join Routine r on gc.class_id=r.class_id";
+$sql = "select routine_name, intensity from routine where membership_id=$mid";
+$sql = "select exercise_name, body_part from exercise where routine_name='$rname' and intensity = $rintensity";
+$sql = "select routine_name, intensity from workon where membership_id=$mid";
+$sql = "select exercise_name, body_part from exercise where routine_name='$rname' and intensity = $rintensity";
+
+editclass.php queries
+$sql = "select membership_id from trainer where membership_id=$mid";
+$sql = "select name, cost, trainer_membership_id, gym_name, gym_location, class_date, start_time, end_time from gymclass where class_id=$cid";
+$sql = "update gymclass set name='$newname', cost=$newcost, trainer_membership_id=$newtrainer, class_date='$newdate', start_time='$newstime', end_time = '$newftime' where class_id=$cid";
+$sql = "select name, trainer.membership_id from gymuser, trainer where trainer.membership_id = gymuser.membership_id order by name";
+
+editexercise.php queries
+$sql = "select membership_id from trainer where membership_id=$mid";
+$sql = "select exercise_name, body_part, benefit from exercise where exercise_name='$name' and body_part ='$body'";
+$sql = "update exercise set exercise_name='$newname', body_part='$newbody', benefit='$newbenefit' where exercise_name='$oldname' and body_part = '$oldbody'";
+
+editgym.php queries
+$sql = "select city, membership_id from gym where gym_name='$gym_name' and gym_location='$gym_loc'";
+$sql = "update gym set city='$newcity', membership_id=$newadmin where gym_name='$gym_name' and gym_location='$gym_loc'";
+$sql = "select name, gymadmin.membership_id from gymuser, gymadmin where gymadmin.membership_id = gymuser.membership_id order by name";
+
+editroutine.php queries
+$sql = "select routine_name, intensity, sets, reps from routine where routine_name='$name' AND intensity = $intensity";
+$sql = "update routine set name='$newname', intensity=$intensity, sets=$sets, reps=$reps where name=$name AND intensity=$intensity";
+
+index.php queries
+$sql = "select Count(*) from gymuser where membership_id = $membership";
+$sqladmin = "select Count(*) from gymadmin where membership_id = $membership";
+$sqlathlete = "select Count(*) from athlete where membership_id = $membership";
+$sqltrainer = "select Count(*) from trainer where membership_id = $membership";
+
+newclass.php queries
+$sql = "select membership_id from gymadmin where membership_id=$mid";
+$sql = "select class_id from gymclass order by class_id desc";
+$sql = "insert into gymclass values($newid, '$name', $cost, $mid, $trainer, '$gymname', '$gymloc', '$date', '$stime', '$ftime')";
+$sql = "select name, trainer.membership_id from gymuser, trainer where trainer.membership_id = gymuser.membership_id order by name";
+
+newroutine.php queries
+$sql = "select membership_id from trainer where membership_id=$mid";
+$sql = "insert into routine values('$name', '$intensity', '$sets', '$reps', '$mid', '$class')";
+$sql = "insert into routine values('$name', '$intensity', '$sets', '$reps', '$mid', NULL)";	
+
+newtrainerclass.php queries
+$sql = "select membership_id from trainer where membership_id=$mid";
+$sql = "select class_id from gymclass order by class_id desc";
+$sql = "insert into gymclass values($newid, '$name', $cost, $admin, $mid, '$gymname', '$gymloc')";
+$sql = "select name, gymAdmin.membership_id from gymuser, gymAdmin where gymAdmin.membership_id = gymuser.membership_id order by name";
+$sql = "select gym_name, gym_location from gym order by gym_name";
+$sql = "select gym_name, gym_location from gym order by gym_location";
+
+queryClasses.php queries
+$sql = "select membership_id from gymuser where membership_id=$mid";
+
+queryroutine.php queries
+$sql = "select membership_id from gymuser where membership_id=$mid";
+
+selectclass.php queries
+$sql = "select membership_id from athlete where membership_id=$mid";
+$sql = "insert into Attends values('$classID', $mid)";
+$sql = "select distinct gc.name, gu.name, gc.class_id, gc.gym_name, gc.gym_location, r.routine_name, gc.cost, gu.membership_id, gc.trainer_membership_id, r.class_id from GymClass gc left join Routine r on r.class_id = gc.class_id join GymUser gu on gu.membership_id=gc.trainer_membership_id";
+$sql = "select distinct gc.gym_name, gc.gym_location, r.routine_name, gc.cost, gc.class_date, gc.start_time, gc.end_time from GymClass gc left join Routine r on r.class_id=gc.class_id where gc.class_id=$classID";
+
+selectroutine.php queries
+$sql = "select membership_id from gymuser where membership_id=$mid";
+$trainers = executePlainSQL("select membership_id from trainer where membership_id = $mid");
+$sql = "insert into workon values('$rouname', $rintensity, $mid)";
+$sql = "select distinct r.routine_name, r.intensity from routine r left join exercise e on r.routine_name = e.routine_name and r.intensity = e.intensity where r.membership_id <> $mid";
+$sql .= " minus (select w.routine_name, w.intensity from workon w where w.membership_id = $mid)";
+$sql = "select exercise_name, body_part from exercise where routine_name='$rname' and intensity = $rintensity";
+
+trainer.php queries
+$sql = "select membership_id from trainer where membership_id=$mid";
+$result = executePlainSQL("select name, email, phone_number from gymuser where membership_id = $mid");
+$sql = "update gymuser set name='" . $newname . "', email='" . $newemail. "', phone_number='"  . $newphone . "' where membership_id=".$mid;
+$sql = "select membership_id from gymuser order by membership_id desc";
+$sql = "insert into gymuser values(".$newid.", '".$u_email."', '".$u_name."', '".$u_phone."')";
+$sql = "select distinct c.class_id, c.name, c.gym_name, c.gym_location, s.class_date, s.start_time, s.end_time, c.cost from GymClass c, FollowSchedule s where trainer_membership_id = $mid AND c.class_id = s.class_id order by name";
+$sql = "select routine_name, intensity, sets, reps from Routine where membership_id = $mid order by intensity";
+
+viewClasses.php queries
+$classNames = executePlainSQL("select gc.name, gc.class_id, a.membership_id, a.class_id from GymClass gc, Attends a where a.class_id=gc.class_id");
+
+createdb.sql queries
+DROP TABLE Attends;
+DROP TABLE WorkOn;
+DROP TABLE Exercise;
+DROP TABLE Routine;
+DROP TABLE GymClass;
+DROP TABLE Gym;
+DROP TABLE Athlete;
+DROP TABLE Trainer;
+DROP TABLE GymAdmin;
+DROP TABLE GymUser;
+
+
+CREATE TABLE GymUser(
+    membership_id int not null,
+    email varchar(40) null,
+    name varchar(40) null,
+    phone_number char(12) null,
+    primary key (membership_id));
+
+CREATE TABLE Athlete (
+    membership_id int not null,
+    primary key (membership_id),
+    foreign key (membership_id) references GymUser ON DELETE CASCADE);
+
+CREATE TABLE Trainer (
+    membership_id int not null,
+    primary key (membership_id),
+    foreign key (membership_id) references GymUser ON DELETE CASCADE);
+
+CREATE TABLE GymAdmin (
+    membership_id int not null,
+    primary key (membership_id),
+    foreign key (membership_id) references GymUser ON DELETE CASCADE);
+    
+CREATE TABLE Gym (
+    gym_name varchar(80) not null,
+    gym_location varchar(80) not null,
+    city varchar(40) null,
+    membership_id int null,
+    primary key (gym_name, gym_location),
+    foreign key (membership_id) references GymAdmin ON DELETE SET NULL);
+
+CREATE TABLE GymClass (
+    class_id int not null,
+    name varchar(80) null,
+    cost decimal(6,2) null,
+    admin_membership_id int null,
+    trainer_membership_id int not null,
+    gym_name varchar(80) not null,
+    gym_location varchar(80) not null,
+    class_date date not null,
+    start_time char(4) not null,
+    end_time char(4) not null,
+    primary key (class_id),
+    foreign key (admin_membership_id) references GymAdmin ON DELETE SET NULL,
+    foreign key (trainer_membership_id) references Trainer ON DELETE CASCADE,
+    foreign key (gym_name, gym_location) references Gym ON DELETE CASCADE);
+    
+CREATE TABLE Routine (
+    routine_name varchar(80) not null,
+    intensity int not null,
+    sets int null,
+    reps int null,
+    membership_id int null,
+    class_id int null,
+    primary key (routine_name, intensity),
+    foreign key (membership_id) references GymUser ON DELETE SET NULL,
+    foreign key (class_id) references GymClass ON DELETE SET NULL,
+    constraint int_pos check(intensity > 0),
+    constraint int_max check(intensity < 11));
+
+CREATE TABLE Attends (
+    class_id int not null,
+    membership_id int not null,
+    primary key (class_id, membership_id),
+    foreign key (class_id) references GymClass ON DELETE CASCADE,
+    foreign key (membership_id) references Athlete ON DELETE CASCADE);
+
+CREATE TABLE WorkOn (
+    routine_name varchar(80) not null,
+    intensity int not null,
+    membership_id int not null,
+    primary key (routine_name, intensity, membership_id),
+    foreign key (routine_name, intensity) references Routine ON DELETE CASCADE,
+    foreign key (membership_id) references Athlete ON DELETE CASCADE);
+
+CREATE TABLE Exercise (
+    exercise_name varchar(80) not null,
+    body_part varchar(20) not null,
+    benefit varchar(500) null,
+    routine_name varchar(80) null,
+    intensity int null,
+    membership_id int null,
+    primary key (exercise_name, body_part),
+    foreign key (routine_name, intensity) references Routine ON DELETE SET NULL,
+    foreign key (membership_id) references GymUser ON DELETE SET NULL);
+    
+partialpopulate.sql queries
+INSERT INTO GymUser values(1, 'aa@gmail.com', 'Aaron Aiken', '111-111-1111');
+INSERT INTO GymUser values(2, 'bb@gmail.com', 'Bob Biles', '222-222-2222');
+INSERT INTO GymUser values(3, 'cc@gmail.com', 'Camry Cain', '333-333-3333');
+INSERT INTO GymUser values(4, 'dd@gmail.com', 'Dan Dough', '444-444-4444');
+INSERT INTO GymUser values(5, 'ee@gmail.com', 'Erin Eagles', '555-555-5555');
+INSERT INTO GymUser values(6, 'ff@gmail.com', 'Felicia Fierce', '666-666-6666');
+INSERT INTO GymUser values(7, 'gg@gmail.com', 'Gary Guiles', '777-777-7777');
+INSERT INTO GymUser values(8, 'hh@gmail.com', 'Henry Ham', '888-888-8888');
+INSERT INTO GymUser values(9, 'ii@gmail.com', 'Indica Isles', '999-999-9999');
+INSERT INTO GymUser values(10, 'jj@gmail.com', 'Jessie James', '101-101-1010');
+INSERT INTO GymUser values(11, 'kk@gmail.com', 'Keiko Kristensen', '111-111-1111');
+INSERT INTO GymUser values(12, 'll@gmail.com', 'Laila Lam', '121-121-1212');
+INSERT INTO GymUser values(13, 'mm@gmail.com', 'Morey Manila', '131-131-1313');
+INSERT INTO GymUser values(14, 'nn@gmail.com', 'Nate Noriega', '141-141-1414');
+INSERT INTO GymUser values(15, 'oo@gmail.com', 'Oban Osterson', '151-151-1515');
+
+
+INSERT INTO Athlete values(1);
+INSERT INTO Athlete values(2);
+INSERT INTO Athlete values(3);
+INSERT INTO Athlete values(4);
+INSERT INTO Athlete values(5);
+
+
+INSERT INTO Trainer values(6);
+INSERT INTO Trainer values(7);
+INSERT INTO Trainer values(8);
+INSERT INTO Trainer values(9);
+INSERT INTO Trainer values(10);
+
+
+INSERT INTO GymAdmin values(11);
+INSERT INTO GymAdmin values(12);
+INSERT INTO GymAdmin values(13);
+INSERT INTO GymAdmin values(14);
+INSERT INTO GymAdmin values(15);
+
+
+INSERT INTO Gym values('Steve Nash', 'Cambie St', 'Vancouver', 11);
+INSERT INTO Gym values('Steve Nash', 'Arbutus', 'Vancouver', 11);
+INSERT INTO Gym values('Crossfit Untamed', 'Broadway', 'Vancouver', 12);
+INSERT INTO Gym values('Golds Gym', 'UBC Campus', 'UBC', 13);
+INSERT INTO Gym values('Birdcoop', 'UBC Campus', 'UBC', 14);
+
+
+INSERT INTO GymClass values(1, 'Spin', 15.00, 11, 6, 'Steve Nash', 'Cambie St', '2016-11-13', '1330', '1430');
+INSERT INTO GymClass values(2, 'Yoga', 35.00, 12, 7, 'Steve Nash', 'Arbutus', '2016-10-25', '1430', '1530');
+INSERT INTO GymClass values(3, 'Power Lifting', 20.50, 11, 8, 'Birdcoop', 'UBC Campus', '2016-11-13', '1500', '1600');
+INSERT INTO GymClass values(4, 'Spin', 15.00, 11, 9, 'Steve Nash', 'Cambie St', '2016-11-17', '1630', '1730');
+INSERT INTO GymClass values(5, 'Squats', 50.00, 15, 10, 'Crossfit Untamed', 'Broadway', '2016-10-31', '2030', '2130');
+
+
+INSERT INTO Routine values('Bicycling', 4, 5, 7, 6, 1);
+INSERT INTO Routine values('Power Yoga', 8, 2, 3, 12, 2);
+INSERT INTO Routine values('Heavy Lifting', 9, 5, 7, 6, 3);
+INSERT INTO Routine values('Bicycling', 5, 5, 7, 9, 4);
+INSERT INTO Routine values('Squats', 2, 5, 10, 15, 5);
+
+
+INSERT INTO Attends values(1, 1);
+INSERT INTO Attends values(2, 2);
+INSERT INTO Attends values(3, 3);
+INSERT INTO Attends values(4, 4);
+INSERT INTO Attends values(5, 5);
+
+
+INSERT INTO WorkOn values('Bicycling', 4, 4);
+INSERT INTO WorkOn values('Bicycling', 5, 5);
+INSERT INTO WorkOn values('Heavy Lifting', 9, 3);
+INSERT INTO WorkOn values('Power Yoga', 8, 3);
+INSERT INTO WorkOn values('Squats', 2, 1);
+
+
+INSERT INTO Exercise values('Vertical Row', 'Back', 'Lats get swole', 'Heavy Lifting', 9, 13);
+INSERT INTO Exercise values('Downward Dog', 'Hamstrings', 'Stretches legs', 'Power Yoga', 8, 9);
+INSERT INTO Exercise values('Elliptical', 'Legs', 'Cardio', 'Bicycling', 4, 6);
+INSERT INTO Exercise values('Barbell Squat', 'Glutes', 'Gives glutes more resistance', 'Squats', 2, 3);
+INSERT INTO Exercise values('Shoulder Press', 'Shoulders', 'Shoulders get swole', 'Heavy Lifting', 9, 13);
+

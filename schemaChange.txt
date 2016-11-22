@@ -1,0 +1,3 @@
+Our original scheme was changed in the following ways:
+- We deleted our scheduling tables (FollowSchedule and Schedule) and moved the start time, end time, and date values to the GymClass table
+- We modified the tables to allow for delete functionality by including ON CASCADE and SET NULL, etc. upon deletion
