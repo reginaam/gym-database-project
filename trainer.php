@@ -6,11 +6,6 @@
         header("Location: index.php");
     }
     
-    $tab = $_GET['tab'];
-	if (!$tab) {
-		$tab = 0;
-	}
-    
     $sql = "select membership_id from trainer where membership_id=$mid";
 	$result = OCI_Parse($db_conn, $sql);
 	oci_execute($result);
@@ -214,9 +209,9 @@ li {
         <p style="margin-top:5px;"><i>Welcome, <?php echo $username ?></i></p>
     </div>
     <div id="nav">
-        <div class="tab <?php if ($tab == 0) echo 'selected';?>" id="personal"><p>Personal Info</p></div>
-        <div class="tab <?php if ($tab == 1) echo 'selected';?>" id="classes"><p>Manage Classes</p></div>
-        <div class="tab <?php if ($tab == 2) echo 'selected';?>" id="routines"><p>Manage Exercises</p></div>
+        <div class="tab selected" id="personal"><p>Personal Info</p></div>
+        <div class="tab" id="classes"><p>Manage Classes</p></div>
+        <div class="tab" id="routines"><p>Manage Exercises</p></div>
     </div>
     <div class="view home" id="personal">
         <div class="innerview">
@@ -233,11 +228,11 @@ li {
 <div class="view" id="classes">
 <div class="innerview">
 <?php
-    $sql = "select distinct c.class_id, c.name, c.gym_name, c.gym_location, c.cost from GymClass c where trainer_membership_id=$mid order by name";
+    $sql = "select distinct c.class_id, c.name, c.gym_name, c.gym_location, s.class_date, s.start_time, s.end_time, c.cost from GymClass c, FollowSchedule s where trainer_membership_id = $mid AND c.class_id = s.class_id order by name";
     $parse = OCI_Parse($db_conn, $sql);
     $r = oci_execute($parse);
     if (!$r) {
-        echo "<span style='color:red';> Could not get class info </span>";
+        echo "<span style='color:red';> Could not get class info";
     }
     else {
         echo "<h3 style='display: inline-block';> Classes </h3><form method=get action='newclass.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><button type='submit' class='newbutton'>+</button></form><hr><ul style='width: 85%; margin: 0 auto;'>";
@@ -246,8 +241,11 @@ li {
             $classname  = $row[1];
             $gymname = $row[2];
             $gymloc = $row[3];
-            $cost = $row[4];
-            echo "<li class='classlist'><p style='display:inline-block;'>$classname | $gymname,$gymloc | $$cost</p><form method=get action='editclass.php' style='display:inline-block;'><input type=hidden name='classid' value='$cid'><input type=hidden name='mid' value=$mid><button type='submit' class='editbutton' ><i class='material-icons'>create</i></button></form><br></li>";
+            $date = $row[4];
+            $start = $row[5];
+            $end = $row[6];
+            $cost = $row[7];
+            echo "<li class='classlist'><p style='display:inline-block;'>$classname | $gymname,$gymloc | $date, $start-$end | $$cost</p><form method=get action='editclass.php' style='display:inline-block;'><input type=hidden name='classid' value='$cid'><input type=hidden name='mid' value=$mid><button type='submit' class='editbutton' ><i class='material-icons'>create</i></button></form><br></li>";
         }
         echo "</ul></li>";
     }
