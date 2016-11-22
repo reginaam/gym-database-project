@@ -9,7 +9,7 @@ if (!$mid || !$name || !$intensity) {
 	header("Location: index.php");
 }
 
-$sql = "select routine_name, intensity, sets, reps from routine where routine_name=$name AND intensity = $intensity";
+$sql = "select routine_name, intensity, sets, reps from routine where routine_name='$name' AND intensity = $intensity";
 $result = OCI_Parse($db_conn, $sql);
 oci_execute($result);
 $row = oci_fetch_array($result);

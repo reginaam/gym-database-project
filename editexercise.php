@@ -25,6 +25,9 @@ $name = $row[0];
 $body = $row[1];
 $benefit = $row[2];
 
+$oldname = $name;
+$oldbody = $body;
+
 $errors = "";
 $nameerror = "";
 $bodyerror = "";
@@ -54,15 +57,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else $benefit = $newbenefit;
 
 	if (!$anyerrors) {
-		$sql = "update exercise set exercise_name='$newname', body_part='$newbody', benefit='$newbenefit' where exercise_name='$name' and body_part = '$body'";
+		$sql = "update exercise set exercise_name='$newname', body_part='$newbody', benefit='$newbenefit' where exercise_name='$oldname' and body_part = '$oldbody'";
 		$result = OCI_Parse($db_conn, $sql);
 		$r = oci_execute($result);
 		if (!$r) {
 			$errors = "Error updating info";
 		} else if ($istrainer) {
-			header("Location: trainer.php?mid=$mid");
+			header("Location: trainer.php?mid=$mid&tab=2");
 		} else {
-			header("Location: athlete.php?mid=$mid");
+			header("Location: athlete.php?mid=$mid&tab=2");
 		}
 	}
 }

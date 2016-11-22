@@ -28,7 +28,7 @@
 		$sql = "insert into Attends values('$classID', $mid)";
 		$result = OCI_Parse($db_conn, $sql);
 		$r = oci_execute($result);
-		header("Location: athlete.php?mid=$mid");
+		header("Location: athlete.php?mid=$mid&tab=1");
 	}
 	
 ?>
@@ -126,7 +126,7 @@
 	<h3> Select a class to attend. </h3>
 	<ul style="width:50%; margin: 0 auto;">
 		<?php 
-			$sql = "select distinct gc.name, gu.name, gc.class_id, gc.gym_name, gc.gym_location, r.routine_name, gc.cost, gu.membership_id, gc.trainer_membership_id, r.class_id from GymClass gc, Routine r, GymUser gu where gu.membership_id=gc.trainer_membership_id";
+			$sql = "select distinct gc.name, gu.name, gc.class_id, gc.gym_name, gc.gym_location, r.routine_name, gc.cost, gu.membership_id, gc.trainer_membership_id, r.class_id from GymClass gc left join Routine r on r.class_id = gc.class_id join GymUser gu on gu.membership_id=gc.trainer_membership_id";
 
 			if ($cname) $sql .= " and upper(gc.name) like upper('%$cname%')";
 			if ($insname) $sql .= " and upper(gu.name) like upper('%$insname%')";
@@ -151,7 +151,7 @@
 					
 					echo "<li class='gymlist'><p style='display:inline-block;'>$cName with $insName</p><form method=post style='display:inline-block;'><input type=hidden name='mid' value=$mid><input type=hidden name='cid' value='$classID'><button class='editgymbutton'><i class='material-icons'>playlist_add</i></button></form><hr><ul><li><p style='color:101010; display: inline-block;'>Info:</p></li>";
 
-					$sql = "select distinct gc.gym_name, gc.gym_location, r.routine_name, gc.cost, gu.membership_id, gc.trainer_membership_id, r.class_id, gc.class_id, from GymClass gc, Routine r, GymUser gu where fs.class_id=gc.class_id and r.class_id=fs.class_id and gu.membership_id=gc.trainer_membership_id and gc.class_id=$classID";
+					$sql = "select distinct gc.gym_name, gc.gym_location, r.routine_name, gc.cost, gc.class_date, gc.start_time, gc.end_time from GymClass gc left join Routine r on r.class_id=gc.class_id where gc.class_id=$classID";
 					$parseex = OCI_Parse($db_conn, $sql);
 					oci_execute($parseex);
 		
@@ -160,11 +160,16 @@
 						$gymLocation = $exrow[1];
 						$routineName = $exrow[2];
 						$classCost = $exrow[3];
+						$date = $exrow[4];
+						$stime = $exrow[5];
+						$ftime = $exrow[6];
 
 						echo "<li class='classlist'><p style='display:inline-block;'>
 							Gym: $gymName, $gymLocation<br>
 							Routine: $routineName<br>
 							Cost: $$classCost<br>
+							Date: $date <br>
+							Time: $stime -> $ftime <br>
 						</p><br></li>";
 					}
 		

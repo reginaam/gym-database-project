@@ -6,6 +6,11 @@ if (!$mid) {
 	header("Location: index.php");
 }
 
+$tab = $_GET['tab'];
+if (!$tab) {
+	$tab = 0;
+}
+
 $sql = "select membership_id from athlete where membership_id=$mid";
 $result = OCI_Parse($db_conn, $sql);
 oci_execute($result);
@@ -70,7 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$sql = "insert into Attends values('$classID', $mid)";
 		$result = OCI_Parse($db_conn, $sql);
 		$r = oci_execute($result);
-		header("Location: athlete.php?mid=$mid");
+		header("Location: athlete.php?mid=$mid&tab=1");
 	}
 	
 	else if (array_key_exists('removeClass', $_POST)) {
@@ -78,7 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$sql = "delete Attends where class_id = $classID and membership_id = $mid";
 		$result = OCI_Parse($db_conn, $sql);
 		$r = oci_execute($result);
-		header("Location: athlete.php?mid=$mid");
+		header("Location: athlete.php?mid=$mid&tab=1");
 	}
 
 }
@@ -185,9 +190,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		<p style="margin-top:5px;"><i>Welcome, <?php echo $username ?></i></p>
 	</div>
 	<div id="nav">
-		<div class="tab selected" id="personal"><p>Personal Info</p></div>
-		<div class="tab" id="gyms"><p>View Classes</p></div>
-		<div class="tab" id="routines"><p>Manage Routines</p></div>
+		<div class="tab <?php if ($tab == 0) echo 'selected';?>" id="personal"><p>Personal Info</p></div>
+		<div class="tab <?php if ($tab == 1) echo 'selected';?>" id="gyms"><p>View Classes</p></div>
+		<div class="tab <?php if ($tab == 2) echo 'selected';?>" id="routines"><p>Manage Routines</p></div>
 	</div>
 	<div class="view home" id="personal">
 		<div class="innerview">
@@ -221,7 +226,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 					echo "<li class='gymlist'><p style='display:inline-block;'>$className with $trainerName</p><form method=post style='display:inline-block;'><input type=hidden name='cid' value='$classID'><button class='editgymbutton' name='removeClass'><i class='material-icons'>-</i></button></form><hr><ul><li><p style='color:101010; display: inline-block;'>Info</p></li>";
 
 					//select individual class info
-					$sql = "select gc.gym_name, gc.gym_location, fs.class_date, fs.start_time, fs.end_time, r.routine_name, gc.cost, r.class_id, gc.class_id, fs.class_id from FollowSchedule fs, GymClass gc, Routine r where fs.class_id=gc.class_id and r.class_id=fs.class_id and fs.class_id=$classID";
+
+					$sql = "select gc.gym_name, gc.gym_location, r.routine_name, gc.cost from GymClass gc left join Routine r on r.class_id=gc.class_id where gc.class_id=$classID";
+
 					$parseclass = OCI_Parse($db_conn, $sql);
 					oci_execute($parseclass);
 
@@ -253,7 +260,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		
 		<div class="half">
 		<?php 
-			$sql = "select distinct gc.name, gu.name, gc.class_id, gc.gym_name, gc.gym_location, fs.class_date, fs.start_time, fs.end_time, r.routine_name, gc.cost, r.class_id, fs.class_id, gu.membership_id, gc.trainer_membership_id, a.class_id, a.membership_id from GymClass gc, GymUser gu, Attends a, FollowSchedule fs, Routine r where gu.membership_id=gc.trainer_membership_id and gc.class_id=a.class_id and gc.class_id=r.class_id and fs.class_id=gc.class_id and a.membership_id!=$mid";
+
+			$nosql = "create view notattends as (select class_id from gymclass) minus (select class_id from attends where attends.membership_id = $mid)";
+			$parse = OCI_Parse($db_conn, $nosql);
+			oci_execute($parse);
+			$sql = "select distinct gc.name, gu.name, gc.class_id, gc.gym_name, gc.gym_location, r.routine_name, gc.cost, gc.class_date, gc.start_time, gc.end_time from GymClass gc join notattends na on na.class_id = gc.class_id join GymUser gu on gu.membership_id=gc.trainer_membership_id left join Routine r on gc.class_id=r.class_id";
+			$parse = OCI_Parse($db_conn, $sql);
+			oci_execute($parse);
+
 			$parse = OCI_Parse($db_conn, $sql);
 				$r = oci_execute($parse);
 				if (!$r) {
@@ -270,12 +284,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 					$trainerName = $row[1];
 					$classID = $row[2];
 					$gym_name = $row[3];
-					$gym_location = $row[4];
-					$class_date = $row[5];
-					$class_start_time = $row[6];
-					$class_end_time = $row[7];	
-					$routine_name = $row[8];
-					$class_cost = $row[9];
+
+					$gym_location = $row[4];	
+					$routine_name = $row[5];
+					$class_cost = $row[6];
+					$date = $row[7];
+					$stime = $row[8];
+					$ftime = $row[9];
+
 
 					echo "<li class='gymlist'><p style='display:inline-block;'>$className with $trainerName</p><form method=post style='display:inline-block;'><input type=hidden name='cid' value='$classID'><button class='editgymbutton' name='addClass'><i class='material-icons'>+</i></button></form><hr><ul><li><p style='color:101010; display: inline-block;'>Info</p></li>";
 
@@ -285,6 +301,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 							Time: $class_start_time -> $class_end_time<br>
 							Routine: $routine_name<br>
 							Cost: $$class_cost<br>
+							Date: $date <br>
+							Time: $stime -> $ftime <br>
 						</p><br></li>";
 						echo "</ul></li>";
 					}

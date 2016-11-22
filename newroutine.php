@@ -52,9 +52,9 @@
 			if (!$r) {
 				$errors = "Failed to create Routine";
 			} else if ($istrainer) {
-				header("Location: trainer.php?mid=$mid");
+				header("Location: trainer.php?mid=$mid&tab=2");
 			} else {
-				header("Location: athlete.php?mid=$mid");
+				header("Location: athlete.php?mid=$mid&tab=2");
 			}
 		}
 	}
