@@ -18,6 +18,9 @@
 	$errors = "";
 	$nameerror = "";
 	$costerror = "";
+	$dateerror = "";
+	$stimeerror = "";
+	$ftimeerror = "";
 	
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$anyerrors = false;
@@ -35,6 +38,25 @@
 			$anyerrors = true;
 		}
 		
+		$date = $_POST['date'];
+		if (!preg_match("/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/", $date) && !preg_match("/^[0-9]{2}-[0-9]{2}-[0-9]{2}$/", $date)) 
+		{
+			$dateerror = "Date must be in format yyyy-mm-dd or yy-mm-dd";
+			$anyerrors = true;
+		}
+		
+		$stime = $_POST['stime'];
+		if (!preg_match("/^[0-2]{1}[0-9]{1}[0-5]{1}[0-9]{1}$/", $stime)) {
+			$stimeerror = "Time must be in format HHMM";
+			$anyerrors = true;
+		}
+		
+		$ftime = $_POST['ftime'];
+		if (!preg_match("/^[0-2]{1}[0-9]{1}[0-5]{1}[0-9]{1}$/", $ftime)) {
+			$ftimeerror = "Time must be in format HHMM";
+			$anyerrors = true;
+		}
+		
 		$trainer = $_POST['trainer'];
 		
 		$sql = "select class_id from gymclass order by class_id desc";
@@ -47,7 +69,7 @@
 			$row = oci_fetch_array($state);
 			$newid = $row[0] + 1;
 			
-			$sql = "insert into gymclass values($newid, '$name', $cost, $mid, $trainer, '$gymname', '$gymloc')";
+			$sql = "insert into gymclass values($newid, '$name', $cost, $mid, $trainer, '$gymname', '$gymloc', '$date', '$stime', '$ftime')";
 			echo $sql;
 			$result = OCI_Parse($db_conn, $sql);
 			$r = oci_execute($result);
@@ -72,6 +94,9 @@
 	<span style="color:red;"><?php echo $errors ?></span>
 	<label> Name: </label><span style="color:red;"><?php echo $nameerror ?></span><input type="text" name="name"><br><br>
 	<label> Cost: </label><span style="color:red;"><?php echo $costerror ?></span><input type="text" name="cost"><br><br>
+	<label> Date: </label><span style="color:red;"><?php echo $dateerror ?></span><input type=text name="date" value=<?php echo $date ?>><br><br>
+	<label> Start time: </label><span style="color:red;"><?php echo $stimeerror ?></span><input type=text name="stime" value=<?php echo $stime ?>><br><br>
+	<label> End time: </label><span style="color:red;"><?php echo $ftimeerror ?></span><input type=text name="ftime" value=<?php echo $ftime ?>><br><br>
 	<label> Trainer: </label><select name="trainer"> 
 		<?php 
 			$sql = "select name, trainer.membership_id from gymuser, trainer where trainer.membership_id = gymuser.membership_id order by name";
@@ -80,9 +105,6 @@
 			
 			while (($row = oci_fetch_array($result)) != false) {
 				$selected = "";
-				if ($row[1] == $tid) {
-					$selected = "selected";
-				}
 				echo "<option value='".$row[1]."' ".$selected.">".$row[0]."</option>";
 			}
 		?></select>

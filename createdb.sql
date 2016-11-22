@@ -1,6 +1,4 @@
 DROP TABLE Attends;
-DROP TABLE FollowSchedule;
-DROP TABLE ClassSchedule;
 DROP TABLE WorkOn;
 DROP TABLE Exercise;
 DROP TABLE Routine;
@@ -76,7 +74,7 @@ CREATE TABLE Attends (
     membership_id int not null,
     primary key (class_id, membership_id),
     foreign key (class_id) references GymClass ON DELETE CASCADE,
-    foreign key (membership_id) references Athlete ON DELETE SET CASCADE);
+    foreign key (membership_id) references Athlete ON DELETE CASCADE);
 
 CREATE TABLE WorkOn (
     routine_name varchar(80) not null,

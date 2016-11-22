@@ -13,14 +13,22 @@
 			<?php
 			include 'basesqlexecutors.php';
 			$classID = $_GET['classID'];
-			$className = executePlainSQL("select name, class_id from GymClass where class_id='$classID'");
-			printClassName($className);
+			$sql = "select name, class_id from GymClass where class_id=$classID";
+			$name = OCI_Parse($db_conn, $sql);
+			oci_execute($name);
+			$row = oci_fetch_array($name, OCI_BOTH);
+			$name = $row[0];
+			echo "<h3> $name </h3>";
 			?>
 			</h1>
 			<p><b>Taught by: </b><i>
 				<?php
-					$instructor = executePlainSQL("select gu.name, gu.membership_id, gc.trainer_membership_id, gc.class_id from GymUser gu, GymClass gc where gu.membership_id=gc.trainer_membership_id and gc.class_id='$classID'");
-					printInstructor($instructor);
+					$sql = "select gu.name, gu.membership_id, gc.trainer_membership_id, gc.class_id from GymUser gu, GymClass gc where gu.membership_id=gc.trainer_membership_id and gc.class_id=$classID";
+					$instructor = OCI_Parse($db_conn, $sql);
+					oci_execute($instructor);
+					while ($row = OCI_Fetch_Array($instructor, OCI_BOTH)) {
+						echo $row["NAME"];
+					}
 				?>
 			</i></p>
 		</div>
@@ -30,8 +38,18 @@
 			<h2>Time and Dates</h2>
 			<p>
 			<?php
-				$schedule = executePlainSQL("select fs.class_id, fs.class_date, fs.start_time, fs.end_time, gc.class_id, gc.gym_name, gc.gym_location from FollowSchedule fs, GymClass gc where gc.class_id=fs.class_id and gc.class_id='$classID'");
-				printClassSchedule($schedule);
+				$sql= "select gc.class_id, gc.gym_name, gc.gym_location, gc.class_date, gc.start_time, gc.end_time from GymClass gc where gc.class_id=$classID";
+				$schedule = OCI_Parse($db_conn, $sql);
+				oci_execute($schedule);
+				while ($row = OCI_Fetch_Array($schedule, OCI_BOTH)) {
+					echo "<p><b>Location: </b><br>";
+					echo $row["GYM_NAME"] . ", " . $row["GYM_LOCATION"] . "</p>";
+					echo "<hr>";
+					echo "<p><b>Date: </b><br>";
+					echo $row["CLASS_DATE"] . "</p>";
+					echo "<p><b>Time: </b><br>";
+					echo $row["START_TIME"] . "->" . $row["END_TIME"] . "</p>";
+				}
 			?>
 			</p>
 			
@@ -41,15 +59,24 @@
 			<h3>Routine and Intensity</h3>
 			<p>
 				<?php
-					$intensity = executePlainSQL("select routine_name, class_id, intensity from Routine where class_id='$classID'");
-					printRoutineInfo($intensity);
+					$sql = "select routine_name, class_id, intensity from Routine where class_id='$classID'";
+					$intensity = OCI_Parse($db_conn, $sql);
+					oci_execute($intensity);
+					while ($row = OCI_Fetch_Array($intensity, OCI_BOTH)) {
+						echo "<p><b>Routine name: </b><i>" . $row["ROUTINE_NAME"] . "</i><br>";
+						echo "<b>Intensity: </b><i>" . $row["INTENSITY"] . "/10</i></p>";
+					}
 				?>
 			</p>
 			
 			<p>
 				<?php
-					$cost = executePlainSQL("select cost, class_id from GymClass where class_id='$classID'");
-					printCost($cost);
+					$sql = "select cost, class_id from GymClass where class_id=$classID";
+					$cost = OCI_Parse($db_conn, $sql);
+					oci_execute($cost);
+					while ($row = OCI_Fetch_Array($cost, OCI_BOTH)) {
+						echo "<p><b>Cost: </b><i>$" . $row["COST"] . "</i></p>";
+					}
 				?>
 			</p>
 
@@ -63,60 +90,3 @@
 	</body>
 
 </html>
-
-<?php
-		
-// Prints the names of all available classes as hyperlinks
-function printClassName($result) {
-	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		echo $row["NAME"];
-	}
-}
-
-// Prints the dates and start and end time of selected class
-function printClassSchedule($result) {
-	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		echo "<p><b>Date: </b><br>";
-		echo $row["CLASS_DATE"];
-		echo "<p><b>Times:</b><br>";
-		echo "Start: <i>" . $row["START_TIME"] . "</i><br>";
-		echo "End: <i>" . $row["END_TIME"] . "</i></p>";
-		echo "<p><b>Location: </b><br>";
-		echo $row["GYM_NAME"] . ", " . $row["GYM_LOCATION"] . "</p>";
-		echo "<hr>";
-	}
-}
-
-// Prints the name of the instructor for the class
-function printInstructor($result){
-	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		echo $row["NAME"];
-	}
-}
-
-
-// Prints the routine info
-function printRoutineInfo($result){
-	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		echo "<p><b>Routine name: </b><i>" . $row["ROUTINE_NAME"] . "</i><br>";
-		echo "<b>Intensity: </b><i>" . $row["INTENSITY"] . "/10</i></p>";
-	}
-}
-
-
-// Prints the cost of the class
-function printCost($result){
-	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		echo "<p><b>Cost: </b><i>$" . $row["COST"] . "</i></p>";
-	}
-}
-
-// need to get the class id and the athlete id and insert the 2 values into Attends
-/*if (array_key_exists('signUp', $_POST)){
-	$cost = executePlainSQL("select cost, class_id from GymClass where class_id='$classID'");
-	executePlainSQL("insert into Attends values()");
-}*/
-
-// Could additionally get the exercises info but not necessary
-
-?>

@@ -43,11 +43,11 @@ INSERT INTO Gym values('Golds Gym', 'UBC Campus', 'UBC', 13);
 INSERT INTO Gym values('Birdcoop', 'UBC Campus', 'UBC', 14);
 
 
-INSERT INTO GymClass values(1, 'Spin', 15.00, 11, 6, 'Steve Nash', 'Cambie St');
-INSERT INTO GymClass values(2, 'Yoga', 35.00, 12, 7, 'Steve Nash', 'Arbutus');
-INSERT INTO GymClass values(3, 'Power Lifting', 20.50, 11, 8, 'Birdcoop', 'UBC Campus');
-INSERT INTO GymClass values(4, 'Spin', 15.00, 11, 9, 'Steve Nash', 'Cambie St');
-INSERT INTO GymClass values(5, 'Squats', 50.00, 15, 10, 'Crossfit Untamed', 'Broadway');
+INSERT INTO GymClass values(1, 'Spin', 15.00, 11, 6, 'Steve Nash', 'Cambie St', '2016-11-13', '1330', '1430');
+INSERT INTO GymClass values(2, 'Yoga', 35.00, 12, 7, 'Steve Nash', 'Arbutus', '2016-10-25', '1430', '1530');
+INSERT INTO GymClass values(3, 'Power Lifting', 20.50, 11, 8, 'Birdcoop', 'UBC Campus', '2016-11-13', '1500', '1600');
+INSERT INTO GymClass values(4, 'Spin', 15.00, 11, 9, 'Steve Nash', 'Cambie St', '2016-11-17', '1630', '1730');
+INSERT INTO GymClass values(5, 'Squats', 50.00, 15, 10, 'Crossfit Untamed', 'Broadway', '2016-10-31', '2030', '2130');
 
 
 INSERT INTO Routine values('Bicycling', 4, 5, 7, 6, 1);
@@ -62,19 +62,6 @@ INSERT INTO Attends values(2, 2);
 INSERT INTO Attends values(3, 3);
 INSERT INTO Attends values(4, 4);
 INSERT INTO Attends values(5, 5);
-
-INSERT INTO ClassSchedule values('2016-11-13', '1330', '1430');
-INSERT INTO ClassSchedule values('2016-10-25', '1430', '1530');
-INSERT INTO ClassSchedule values('2016-11-13', '1500', '1600');
-INSERT INTO ClassSchedule values('2016-11-17', '1630', '1730');
-INSERT INTO ClassSchedule values('2016-10-31', '2030', '2130');
-
-
-INSERT INTO FollowSchedule values(1, '2016-10-25', '1430', '1530');
-INSERT INTO FollowSchedule values(1, '2016-11-13', '1500', '1600');
-INSERT INTO FollowSchedule values(2, '2016-10-25', '1430', '1530');
-INSERT INTO FollowSchedule values(3, '2016-11-17', '1630', '1730');
-INSERT INTO FollowSchedule values(4, '2016-10-31', '2030', '2130');
 
 
 INSERT INTO WorkOn values('Bicycling', 4, 4);
