@@ -216,7 +216,7 @@ li {
     <div id="nav">
         <div class="tab <?php if ($tab == 0) echo 'selected';?>" id="personal"><p>Personal Info</p></div>
         <div class="tab <?php if ($tab == 1) echo 'selected';?>" id="classes"><p>Manage Classes</p></div>
-        <div class="tab <?php if ($tab == 2) echo 'selected';?>" id="routines"><p>Manage Exercises</p></div>
+        <div class="tab <?php if ($tab == 2) echo 'selected';?>" id="routines"><p>Manage Routines</p></div>
     </div>
     <div class="view home" id="personal">
         <div class="innerview">
@@ -240,7 +240,7 @@ li {
         echo "<span style='color:red';> Could not get class info </span>";
     }
     else {
-        echo "<h3 style='display: inline-block';> Classes </h3><form method=get action='newclass.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><button type='submit' class='newbutton'>+</button></form><hr><ul style='width: 85%; margin: 0 auto;'>";
+        echo "<h3 style='display: inline-block';> Classes </h3><form method=get action='newtrainerclass.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><button type='submit' class='newbutton'>+</button></form><form method=get action='queryClasses.php' style='display:inline-block;'><input type=hidden name='mid' value=" . $mid . "><button type='submit' class='editbutton'><i class='material-icons'>find_in_page</i></button></form><hr><ul style='width: 85%; margin: 0 auto;'>";
         while (($row = oci_fetch_array($parse, OCI_BOTH)) != false) {
             $cid = $row[0];
             $classname  = $row[1];
@@ -264,7 +264,7 @@ li {
         echo "<span style='color:red';> Could not get routine info";
     }
     else {
-        echo "<h3 style='display: inline-block';> Routines </h3><form method=get action='newroutine.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><button type='submit' class='newbutton'>+</button></form><hr><ul style='width: 85%; margin: 0 auto;'>";
+        echo "<h3 style='display: inline-block';> Routines </h3><form method=get action='newroutine.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><button type='submit' class='newbutton'>+</button></form><form method=get action='queryroutine.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><button type='submit' class='editbutton'><i class='material-icons'>find_in_page</i></button></form><hr><ul style='width: 85%; margin: 0 auto;'>";
         while (($row = oci_fetch_array($parse, OCI_BOTH)) != false) {
             $routinename  = $row[0];
             $intensity = $row[1];
