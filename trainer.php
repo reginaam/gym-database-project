@@ -146,6 +146,7 @@
         height: 50px;
         margin: 0 auto;
         margin-top: 10px;
+        padding-bottom: 10px;
         border-bottom: 3px solid #ff4545;
         text-align: center;
     }
@@ -190,17 +191,30 @@ li {
     padding: 7px;
 }
 
-.classlist {
-    color: #ff4545;
+.mainlist {
+color: #4489ff;
 }
 
-.classlist:nth-child(odd) {
+.mainlist:nth-child(even) {
     background-color: #f1f1f1;
 }
 
-.classlist:nth-child(even) {
+.mainlist:nth-child(odd) {
+    background-color: #e2e7ff;
+}
+
+.sublist {
+color: #ff4545;
+}
+
+.sublist:nth-child(odd) {
+    background-color: #f1f1f1;
+}
+
+.sublist:nth-child(even) {
     background-color: #ffe9e9;
 }
+
 </style>
 </head>
 <body>
@@ -247,7 +261,7 @@ li {
             $start = $row[5];
             $end = $row[6];
             $cost = $row[7];
-            echo "<li class='classlist'><p style='display:inline-block;'>$classname | $gymname,$gymloc | $date, $start-$end | $$cost</p><form method=get action='editclass.php' style='display:inline-block;'><input type=hidden name='classid' value='$cid'><input type=hidden name='mid' value=$mid><button type='submit' class='editbutton' ><i class='material-icons'>create</i></button></form><br></li>";
+            echo "<li class='mainlist'><p style='display:inline-block;'>$classname | $gymname,$gymloc | $date, $start-$end | $$cost</p><form method=get action='editclass.php' style='display:inline-block;'><input type=hidden name='classid' value='$cid'><input type=hidden name='mid' value=$mid><button type='submit' class='editbutton' ><i class='material-icons'>create</i></button></form><br></li>";
         }
         echo "</ul></li>";
     }
@@ -270,7 +284,7 @@ li {
             $intensity = $row[1];
             $sets = $row[2];
             $reps = $row[3];
-            echo "<li class='routinelist'><p style='display:inline-block;'>$routinename | Difficulty: $intensity | Sets: $sets | Reps: $reps</p><form method=get action='editroutine.php' style='display:inline-block;'><input type=hidden name='routinename' value='$routinename'><input type=hidden name='intensity' value='$intensity'><input type=hidden name='mid' value=$mid><button type='submit' class='editbutton' ><i class='material-icons'>create</i></button></form><hr><ul><li><p style='color:101010; display: inline-block;'>Exercises</p><form method=get action='newexercise.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><input type=hidden name='routinename' value='$routinename'><input type=hidden name='intensity' value=$intensity><button type='submit' class='newbutton'>+</button></form><hr></li>";
+            echo "<li class='mainlist'><p style='display:inline-block;'>$routinename | Difficulty: $intensity | Sets: $sets | Reps: $reps</p><form method=get action='editroutine.php' style='display:inline-block;'><input type=hidden name='routinename' value='$routinename'><input type=hidden name='intensity' value='$intensity'><input type=hidden name='mid' value=$mid><button type='submit' class='editbutton' ><i class='material-icons'>create</i></button></form><hr><ul><li><p style='color:101010; display: inline-block;'>Exercises</p><form method=get action='newexercise.php' style='display:inline-block;'><input type=hidden name='mid' value=$mid><input type=hidden name='routinename' value='$routinename'><input type=hidden name='intensity' value=$intensity><button type='submit' class='newbutton'>+</button></form><hr></li>";
             $sql = "select exercise_name, body_part, benefit from exercise where routine_name = '$routinename' AND intensity = $intensity";
             $parseexercise = OCI_Parse($db_conn, $sql);
             oci_execute($parseexercise);
@@ -279,7 +293,7 @@ li {
                 $exercisename = $exerciserow[0];
                 $body = $exerciserow[1];
                 $benefit = $exerciserow[2];
-                echo "<li class='exerciselist'><p style='display:inline-block;'>$exercisename | $body | $benefit</p><form method=get action='editexercise.php' style='display:inline-block;'><input type=hidden name='exercisename' value=$exercisename><input type=hidden name='bodypart' value=$body><input type=hidden name='mid' value=$mid><button type='submit' class='editbutton'><i class='material-icons'>create</i></button></form><br></li>";
+                echo "<li class='sublist'><p style='display:inline-block;'>$exercisename | $body | $benefit</p><form method=get action='editexercise.php' style='display:inline-block;'><input type=hidden name='exercisename' value=$exercisename><input type=hidden name='bodypart' value=$body><input type=hidden name='mid' value=$mid><button type='submit' class='editbutton'><i class='material-icons'>create</i></button></form><br></li>";
             }
             
             echo "</ul></li>";
