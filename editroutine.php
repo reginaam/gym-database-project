@@ -28,13 +28,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$newname = $name;
 		$nameerror = "Name too long";
 		$anyerrors = true;
-	} else $name = $newname;
+	} else $newname = $newname;
 	
 	$intensity = $_POST['intensity'];
     $sets = $_POST['sets'];
 	$reps = $_POST['reps'];
 	if (!$anyerrors) {
-		$sql = "update routine set name='$newname', intensity=$intensity, sets=$sets, reps=$reps where name=$name AND intensity=$intensity";
+		$sql = "update routine set routine_name='$newname', intensity=$intensity, sets=$sets, reps=$reps where routine_name='$name' AND intensity=$intensity";
 		$result = OCI_Parse($db_conn, $sql);
 		$r = oci_execute($result);
 		if (!$r) {
