@@ -171,6 +171,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$bpartresult = OCI_Parse($db_conn, $sql);
 		oci_execute($bpartresult);
 	}
+	else if (array_key_exists('deleteClass', $_POST)) { 
+		$classid = $_POST['classid'];
+		$mid = $_POST['mid'];
+		$sql = "delete GymClass where class_id = $classid";
+		$result = OCI_Parse($db_conn, $sql);
+		$r = oci_execute($result);
+		header("Location: admin.php?mid=$mid");
+	}
 }
 
 
@@ -313,7 +321,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 						$classname = $classrow[1];
 						$cost = $classrow[2];
 						$tname = $classrow[3];
-						echo "<li class='classlist'><p style='display:inline-block;'>$classname with $tname, $$cost</p><form method=get action='editclass.php' style='display:inline-block;'><input type=hidden name='classid' value=$cid><input type=hidden name='mid' value=$mid><button type='submit' class='editgymbutton'><i class='material-icons'>create</i></button></form><br></li>";
+						echo "<li class='classlist'><p style='display:inline-block;'>$classname with $tname, $$cost</p><form method=get action='editclass.php' style='display:inline-block;'><input type=hidden name='classid' value='$cid'><input type=hidden name='mid' value='$mid'><button type='submit' class='editgymbutton'><i class='material-icons'>create</i></button></form>
+						<form method=post style='display:inline-block;'><input type=hidden name='classid' value=$cid><input type=hidden name='mid' value=$mid><button class='editgymbutton' name='deleteClass'><i class='material-icons'>delete</i></button></form>
+						<br></li>";
+						
 					}
 					
 					echo "</ul></li>";
