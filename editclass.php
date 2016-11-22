@@ -8,7 +8,15 @@ if (!$mid || !$cid) {
 	header("Location: index.php");
 }
 
-$sql = "select name, cost, trainer_membership_id, gym_name, gym_location from gymclass where class_id=$cid";
+$istrainer = true;
+$sql = "select membership_id from trainer where membership_id=$mid";
+$result = OCI_Parse($db_conn, $sql);
+oci_execute($result);
+if (!oci_fetch_array($result)) {
+	$istrainer = false;
+}
+
+$sql = "select name, cost, trainer_membership_id, gym_name, gym_location, class_date, start_time, end_time from gymclass where class_id=$cid";
 $result = OCI_Parse($db_conn, $sql);
 oci_execute($result);
 $row = oci_fetch_array($result);
@@ -17,10 +25,16 @@ $cost = $row[1];
 $tid = $row[2];
 $gym_name = $row[3];
 $gym_loc = $row[4];
+$date = $row[5];
+$stime = $row[6];
+$ftime = $row[7];
 
 $errors = "";
 $nameerror = "";
 $costerror = "";
+$dateerror = "";
+$stimeerror = "";
+$ftimeerror = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$anyerrors = false;
@@ -39,15 +53,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$anyerrors = true;
 	}
 	
+	$newdate = $_POST['date'];
+	if (!preg_match("/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/", $newdate) && !preg_match("/^[0-9]{2}-[0-9]{2}-[0-9]{2}$/", $newdate)) 
+	{
+		$newdate = $date;
+		$dateerror = "Date must be in format yyyy-mm-dd or yy-mm-dd";
+		$anyerrors = true;
+	} else $date = $newdate;
+	
+	$newstime = $_POST['stime'];
+	if (!preg_match("/^[0-2]{1}[0-9]{1}[0-5]{1}[0-9]{1}$/", $newstime)) {
+		$newstime = $stime;
+		$stimeerror = "Time must be in format HHMM";
+		$anyerrors = true;
+	} else $stime = $newstime;
+	
+	$newftime = $_POST['ftime'];
+	if (!preg_match("/^[0-2]{1}[0-9]{1}[0-5]{1}[0-9]{1}$/", $newftime)) {
+		$newftime = $ftime;
+		$ftimeerror = "Time must be in format HHMM";
+		$anyerrors = true;
+	} else $ftime = $newftime;
+	
 	$newtrainer = $_POST['trainer'];
 	if (!$anyerrors) {
-		$sql = "update gymclass set name='$newname', cost=$newcost, trainer_membership_id=$newtrainer where class_id=$cid";
+		$sql = "update gymclass set name='$newname', cost=$newcost, trainer_membership_id=$newtrainer, class_date='$newdate', start_time='$newstime', end_time = '$newftime' where class_id=$cid";
 		$result = OCI_Parse($db_conn, $sql);
 		$r = oci_execute($result);
 		if (!$r) {
 			$errors = "Error updating info";
-		} else {
+		} else if (!$istrainer) {
 			header("Location: admin.php?mid=$mid&tab=1");
+		} else {
+			header("Location: trainer.php?mid=$mid&tab=1");
 		}
 	}
 }
@@ -66,6 +104,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		<span style="color:red;"><?php echo $errors ?></span>
 		<label> Name: </label><span style="color:red;"><?php echo $nameerror ?></span><input type=text name="name" value="<?php echo $name ?>"><br><br>
 		<label> Cost: </label><span style="color:red;"><?php echo $costerror ?></span><input type=text name="cost" value=<?php echo $cost ?>><br><br>
+		<label> Date: </label><span style="color:red;"><?php echo $dateerror ?></span><input type=text name="date" value=<?php echo $date ?>><br><br>
+		<label> Start time: </label><span style="color:red;"><?php echo $stimeerror ?></span><input type=text name="stime" value=<?php echo $stime ?>><br><br>
+		<label> End time: </label><span style="color:red;"><?php echo $ftimeerror ?></span><input type=text name="ftime" value=<?php echo $ftime ?>><br><br>
 		<label> Trainer: </label><select name="trainer"> 
 		<?php 
 			$sql = "select name, trainer.membership_id from gymuser, trainer where trainer.membership_id = gymuser.membership_id order by name";
