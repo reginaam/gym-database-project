@@ -40,7 +40,7 @@ CREATE TABLE Gym (
     city varchar(40) null,
     membership_id int null,
     primary key (gym_name, gym_location),
-    foreign key (membership_id) references GymAdmin);
+    foreign key (membership_id) references GymAdmin ON DELETE SET NULL);
 
 CREATE TABLE GymClass (
     class_id int not null,
@@ -50,10 +50,13 @@ CREATE TABLE GymClass (
     trainer_membership_id int not null,
     gym_name varchar(80) not null,
     gym_location varchar(80) not null,
+    class_date date not null,
+    start_time char(4) not null,
+    end_time char(4) not null,
     primary key (class_id),
-    foreign key (admin_membership_id) references GymAdmin,
-    foreign key (trainer_membership_id) references Trainer,
-    foreign key (gym_name, gym_location) references Gym);
+    foreign key (admin_membership_id) references GymAdmin ON DELETE SET NULL,
+    foreign key (trainer_membership_id) references Trainer ON DELETE CASCADE,
+    foreign key (gym_name, gym_location) references Gym ON DELETE CASCADE);
     
 CREATE TABLE Routine (
     routine_name varchar(80) not null,
@@ -63,8 +66,8 @@ CREATE TABLE Routine (
     membership_id int null,
     class_id int null,
     primary key (routine_name, intensity),
-    foreign key (membership_id) references GymUser,
-    foreign key (class_id) references GymClass,
+    foreign key (membership_id) references GymUser ON DELETE SET NULL,
+    foreign key (class_id) references GymClass ON DELETE SET NULL,
     constraint int_pos check(intensity > 0),
     constraint int_max check(intensity < 11));
 
@@ -72,31 +75,16 @@ CREATE TABLE Attends (
     class_id int not null,
     membership_id int not null,
     primary key (class_id, membership_id),
-    foreign key (class_id) references GymClass,
-    foreign key (membership_id) references Athlete);
-    
-CREATE TABLE ClassSchedule (
-    class_date date not null,
-    start_time char(4) not null,
-    end_time char(4) not null,
-    primary key (class_date, start_time, end_time));
-
-CREATE TABLE FollowSchedule (
-    class_id int not null,
-    class_date date not null,
-    start_time char(4) not null,
-    end_time char(4) not null,
-    primary key (class_id, class_date, start_time, end_time),
-    foreign key (class_id) references GymClass,
-    foreign key (class_date, start_time, end_time) references ClassSchedule);
+    foreign key (class_id) references GymClass ON DELETE CASCADE,
+    foreign key (membership_id) references Athlete ON DELETE SET CASCADE);
 
 CREATE TABLE WorkOn (
     routine_name varchar(80) not null,
     intensity int not null,
     membership_id int not null,
     primary key (routine_name, intensity, membership_id),
-    foreign key (routine_name, intensity) references Routine,
-    foreign key (membership_id) references Athlete);
+    foreign key (routine_name, intensity) references Routine ON DELETE CASCADE,
+    foreign key (membership_id) references Athlete ON DELETE CASCADE);
 
 CREATE TABLE Exercise (
     exercise_name varchar(80) not null,
@@ -106,5 +94,5 @@ CREATE TABLE Exercise (
     intensity int null,
     membership_id int null,
     primary key (exercise_name, body_part),
-    foreign key (routine_name, intensity) references Routine,
-    foreign key (membership_id) references GymUser);
+    foreign key (routine_name, intensity) references Routine ON DELETE SET NULL,
+    foreign key (membership_id) references GymUser ON DELETE SET NULL);
